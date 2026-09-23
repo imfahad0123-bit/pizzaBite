@@ -950,17 +950,22 @@ const DEFAULT_ICONS={"Pizzas":"🍕","Burgers":"🍔","Shawarmas":"🌯","Roll P
 const DEFAULT_SUBS={"Pizzas":"Freshly prepared with premium toppings.","Burgers":"Juicy favourites made to order.","Shawarmas":"Loaded wraps with savoury fillings.","Roll Parathas":"Hot paratha rolls with hearty fillings.","Deals":"Big value for hungry groups.","French Fries":"Crispy sides for every order.","Crispy Crunch":"Crispy chicken favourites.","Beverages":"Cold drinks and refreshing water.","Super Deals":"Extra value on your favourites.","Popular":"Customer favourites.","Pasta":"Creamy, spicy and delicious."};
 const PIZZA_GROUPS={"Regular":["Chicken Tikka","Chicken Fajita","Chicken Supreme","Hot & Spicy","Chicken Creamy"],"Special":["Chicken Mughlai","Malai Boti","Chicken Achari","Cheese Lover","Euro Bite"],"Crown Crust":["Crown Crust Pizza","Seekh Kabab","Kabab Staifer"]};
 let pizzaGroupActive="Regular";
-const EXTRAS_DATA=[
-  {group:"Extra Topping",items:[
-    {id:"ext_topping_s",label:"S",desc:"+Rs. 50",price:50},
-    {id:"ext_topping_m",label:"M",desc:"+Rs. 100",price:100},
-    {id:"ext_topping_l",label:"L",desc:"+Rs. 150",price:150},
-    {id:"ext_topping_xl",label:"XL",desc:"+Rs. 200",price:200}
-  ]},
-  {group:"Extra Sauce",items:[
-    {id:"ext_sauce",label:"Regular",desc:"+Rs. 50",price:50}
-  ]}
-];
+let EXTRAS_DATA=[];
+function applyExtrasData(rows){
+  if(!Array.isArray(rows)){EXTRAS_DATA=[];return}
+  const groups={};
+  rows.forEach(r=>{
+    const group=String(r.group||r.Group||'').trim();
+    const id=String(r.id??r.ID??'').trim();
+    const label=String(r.label||r.Label||'').trim();
+    const price=Number(r.price??r.Price)||0;
+    if(!group||!label||!id)return;
+    if(!groups[group])groups[group]=[];
+    const shortLabel=label==='Extra Large'?'XL':label==='Medium'?'M':label==='Large'?'L':label==='Small'?'S':label;
+    groups[group].push({id,group,label:shortLabel,fullLabel:label,desc:'+Rs. '+money(price),price});
+  });
+  EXTRAS_DATA=Object.keys(groups).map(g=>({group:g,items:groups[g]}));
+}
 function addExtra(id,name,variant,price){addLine({key:id,itemId:id,name,variant,quantity:1,price,category:'Extras'})}
 const WA_SVG='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
 function shareWhatsApp(id){
@@ -971,10 +976,10 @@ function shareWhatsApp(id){
   window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank','noopener');
 }
 let pizzaExtrasSelected={};
-function findExtraByKey(key){for(const g of EXTRAS_DATA){for(const item of g.items){if(item.id===key)return{group:g.group,id:item.id,label:item.label,price:item.price}}}return null}
+function findExtraByKey(key){for(const g of EXTRAS_DATA){for(const item of g.items){if(item.id===key)return{group:g.group,id:item.id,label:item.fullLabel||item.label,price:item.price}}}return null}
 function togglePizzaExtra(key,price,group){
   if(pizzaExtrasSelected[key]){delete pizzaExtrasSelected[key]}
-  else{if(group==='Extra Topping'){Object.keys(pizzaExtrasSelected).forEach(k=>{if(k.startsWith('ext_topping_'))delete pizzaExtrasSelected[k]})}pizzaExtrasSelected[key]=price}
+  else{if(group==='Extra Topping'){Object.keys(pizzaExtrasSelected).forEach(k=>{const e=findExtraByKey(k);if(e&&e.group==='Extra Topping')delete pizzaExtrasSelected[k]})}pizzaExtrasSelected[key]=price}
   document.querySelectorAll('#pizzaBody .pizza-extra-opt').forEach(btn=>{btn.classList.toggle('sel',!!pizzaExtrasSelected[btn.dataset.extraKey])});
   updatePizzaPickerPrice();
 }
@@ -1014,6 +1019,7 @@ async function loadData(){
     menu=Array.isArray(r.menu)?r.menu.filter(x=>isTrue(x.Available)):[];
     categories=Array.isArray(r.categories)?r.categories.filter(x=>isTrue(x.Active)).sort((a,b)=>Number(a.SortOrder)-Number(b.SortOrder)):[];
     siteOffers=Array.isArray(r.offers)?r.offers.filter(x=>isTrue(x.Active!==undefined?x.Active:true)).sort((a,b)=>Number(a.SortOrder||0)-Number(b.SortOrder||0)):[];
+    applyExtrasData(Array.isArray(r.extras)?r.extras:[]);
     const featured=menu.filter(x=>isTrue(x.Featured));
     if(featured.length)categories.unshift({ID:"popular",Name:"Popular",SortOrder:-1,Active:true,Image:"",Subtitle:""});
     applySiteContent();renderOffers();
@@ -1228,7 +1234,7 @@ function confirmPizza(name){
   const qty=Math.max(1,Number(document.getElementById('pizzaQty')?.textContent||1));
   const selectedExtras=Object.keys(pizzaExtrasSelected).map(key=>{
     const ex=findExtraByKey(key);if(!ex)return null;
-    return {itemId:ex.id,name:ex.group,variant:ex.label,quantity:1,price:ex.price};
+    return {itemId:ex.id,group:ex.group,label:ex.label,name:ex.group,variant:ex.label,quantity:1,price:ex.price};
   }).filter(Boolean);
   const newKey=makeCartKey('Pizzas',s.id,selectedExtras);
   if(editingKey){cart=cart.filter(x=>x.key!==editingKey);editingKey=null}
@@ -1341,7 +1347,7 @@ function openCart(){if(!window.matchMedia('(max-width:900px)').matches){const p=
 function closeCartPopover(){const p=document.getElementById('cartPopover');p.classList.remove('open');document.querySelector('.cart-head').setAttribute('aria-expanded','false')}
 function startCheckout(){if(!cart.length)return;closeModal('cartModal');const t=totals();document.getElementById('checkoutSummary').innerHTML='<div class="sumrow"><span>Subtotal</span><strong>Rs. '+money(t.subtotal)+'</strong></div><div class="sumrow"><span>Delivery</span><strong>'+esc(cfg('delivery_fee_label','FREE'))+'</strong></div><div class="sumrow total"><span>Total</span><strong>Rs. '+money(t.total)+'</strong></div>';openModal('checkoutModal')}
 
-document.getElementById('checkoutForm').addEventListener('submit',async e=>{e.preventDefault();if(!cart.length)return;const f=new FormData(e.target);const idKey=sessionStorage.getItem('pb_checkout_idempotency')||('WEB-'+Date.now()+'-'+Math.random().toString(36).slice(2,10));sessionStorage.setItem('pb_checkout_idempotency',idKey);const baseNotes=String(f.get('notes')||'').trim();const payload={idempotencyKey:idKey,customerName:String(f.get('customerName')||'').trim(),phone:String(f.get('phone')||'').trim(),address:String(f.get('address')||'').trim(),area:String(f.get('area')||'').trim(),paymentMethod:String(f.get('paymentMethod')||'Cash on Delivery'),notes:baseNotes,orderSource:'Website',fulfillmentType:fulfillmentType,items:cart.filter(x=>x.category!=='Extras').map(x=>{const item={itemId:x.itemId,quantity:x.quantity};if(Array.isArray(x.extras)&&x.extras.length)item.extras=x.extras.map(ex=>({itemId:ex.itemId,quantity:ex.quantity||1}));return item})};const b=e.target.querySelector('button[type=submit]');b.disabled=true;b.textContent='Placing order…';try{const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});const j=await r.json();if(!j.success)throw new Error(j.error||'Order failed');sessionStorage.removeItem('pb_checkout_idempotency');closeModal('checkoutModal');saveTrackedOrder(j.orderId||'Pizza Bite Order',j.trackingToken||'');renderSuccessPlaced(j.orderId||'Pizza Bite Order');playSuccessSound();cart=[];e.target.reset();renderCart()}catch(err){console.error(err);const m=String(err.message||'');const safe=!/Failed to fetch|Unexpected token|NetworkError|SyntaxError/i.test(m)&&m!=='Order failed'&&m?m:'We could not place the order right now. Please try again.';alert(safe+'. The same checkout can be retried safely.')}finally{b.disabled=false;b.textContent='Place Order'}});
+document.getElementById('checkoutForm').addEventListener('submit',async e=>{e.preventDefault();if(!cart.length)return;const f=new FormData(e.target);const idKey=sessionStorage.getItem('pb_checkout_idempotency')||('WEB-'+Date.now()+'-'+Math.random().toString(36).slice(2,10));sessionStorage.setItem('pb_checkout_idempotency',idKey);const baseNotes=String(f.get('notes')||'').trim();const payload={idempotencyKey:idKey,customerName:String(f.get('customerName')||'').trim(),phone:String(f.get('phone')||'').trim(),address:String(f.get('address')||'').trim(),area:String(f.get('area')||'').trim(),paymentMethod:String(f.get('paymentMethod')||'Cash on Delivery'),notes:baseNotes,orderSource:'Website',fulfillmentType:fulfillmentType,items:cart.filter(x=>x.category!=='Extras').map(x=>{const item={itemId:x.itemId,quantity:x.quantity};if(Array.isArray(x.extras)&&x.extras.length)item.extras=x.extras.map(ex=>({itemId:ex.itemId,group:ex.group||ex.name||'',label:ex.label||ex.variant||'',quantity:ex.quantity||1}));return item})};const b=e.target.querySelector('button[type=submit]');b.disabled=true;b.textContent='Placing order…';try{const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});const j=await r.json();if(!j.success)throw new Error(j.error||'Order failed');sessionStorage.removeItem('pb_checkout_idempotency');closeModal('checkoutModal');saveTrackedOrder(j.orderId||'Pizza Bite Order',j.trackingToken||'');renderSuccessPlaced(j.orderId||'Pizza Bite Order');playSuccessSound();cart=[];e.target.reset();renderCart()}catch(err){console.error(err);const m=String(err.message||'');const safe=!/Failed to fetch|Unexpected token|NetworkError|SyntaxError/i.test(m)&&m!=='Order failed'&&m?m:'We could not place the order right now. Please try again.';alert(safe+'. The same checkout can be retried safely.')}finally{b.disabled=false;b.textContent='Place Order'}});
 document.querySelectorAll('#checkoutForm input, #checkoutForm textarea, #checkoutForm select').forEach(function(el){el.addEventListener('focus',function(){setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'center'})},350)})});
 
 let toastTimer=null;
