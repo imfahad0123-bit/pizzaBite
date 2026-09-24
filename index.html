@@ -868,6 +868,33 @@ const DEFAULT_ICONS={"Pizzas":"🍕","Burgers":"🍔","Shawarmas":"🌯","Roll P
 const DEFAULT_SUBS={"Pizzas":"Freshly prepared with premium toppings.","Burgers":"Juicy favourites made to order.","Shawarmas":"Loaded wraps with savoury fillings.","Roll Parathas":"Hot paratha rolls with hearty fillings.","Deals":"Big value for hungry groups.","French Fries":"Crispy sides for every order.","Crispy Crunch":"Crispy chicken favourites.","Beverages":"Cold drinks and refreshing water.","Super Deals":"Extra value on your favourites.","Popular":"Customer favourites.","Pasta":"Creamy, spicy and delicious."};
 const PIZZA_GROUPS={"Regular":["Chicken Tikka","Chicken Fajita","Chicken Supreme","Hot & Spicy","Chicken Creamy"],"Special":["Chicken Mughlai","Malai Boti","Chicken Achari","Cheese Lover","Euro Bite"],"Crown Crust":["Crown Crust Pizza","Seekh Kabab","Kabab Staifer"]};
 let pizzaGroupActive="Regular";
+let pizzaGroupsApi=null;
+function getPizzaGroups(){
+  if(pizzaGroupsApi&&Object.keys(pizzaGroupsApi).length)return pizzaGroupsApi;
+  return PIZZA_GROUPS;
+}
+function buildPizzaGroupsFromApi(subcats,menuItems){
+  if(!Array.isArray(subcats)||!subcats.length||!Array.isArray(menuItems))return null;
+  const active=subcats.filter(s=>isTrue(s.Active));
+  if(!active.length)return null;
+  active.sort((a,b)=>(Number(a.SortOrder)||0)-(Number(b.SortOrder)||0));
+  const idToName={};
+  active.forEach(s=>{idToName[String(s.ID)]=String(s.Name)});
+  const groups={};
+  active.forEach(s=>{groups[String(s.Name)]=[]});
+  let matched=0;
+  menuItems.forEach(m=>{
+    if(String(m.CategoryID)!=="1")return;
+    const scId=String(m.SubcategoryID||"");
+    const gName=idToName[scId];
+    if(gName&&groups[gName]){
+      const n=String(m.Name||"").trim();
+      if(n&&!groups[gName].includes(n)){groups[gName].push(n);matched++}
+    }
+  });
+  if(!matched)return null;
+  return groups;
+}
 let EXTRAS_DATA=[];
 function applyExtrasData(rows){
   if(!Array.isArray(rows)){EXTRAS_DATA=[];return}
@@ -938,6 +965,16 @@ async function loadData(){
     categories=Array.isArray(r.categories)?r.categories.filter(x=>isTrue(x.Active)).sort((a,b)=>Number(a.SortOrder)-Number(b.SortOrder)):[];
     siteOffers=Array.isArray(r.offers)?r.offers.filter(x=>isTrue(x.Active!==undefined?x.Active:true)).sort((a,b)=>Number(a.SortOrder||0)-Number(b.SortOrder||0)):[];
     applyExtrasData(Array.isArray(r.extras)?r.extras:[]);
+    try{
+      const sc=await fetch(API_URL+"?action=subcategories&categoryId=1").then(r=>r.json());
+      if(sc&&sc.success&&Array.isArray(sc.subcategories)){
+        pizzaGroupsApi=buildPizzaGroupsFromApi(sc.subcategories,menu);
+        if(pizzaGroupsApi){
+          const keys=Object.keys(pizzaGroupsApi);
+          if(keys.length&&!keys.includes(pizzaGroupActive))pizzaGroupActive=keys[0];
+        }
+      }
+    }catch(e){pizzaGroupsApi=null}
     const featured=menu.filter(x=>isTrue(x.Featured));
     if(featured.length)categories.unshift({ID:"popular",Name:"Popular",SortOrder:-1,Active:true,Image:"",Subtitle:""});
     applySiteContent();applyLandingWebsiteConfig();renderOffers();
@@ -1024,7 +1061,7 @@ function render(){
     }else if(String(cat.ID)==="9"){
       items=EXTRAS_DATA;
     }else if(String(cat.ID)==="1"&&!q){
-      const gn=PIZZA_GROUPS[pizzaGroupActive]||[];
+      const gn=getPizzaGroups()[pizzaGroupActive]||[];
       items=visible.filter(x=>String(x.CategoryID)===String(cat.ID)&&gn.includes(String(x.Name||'').trim()));
     }else if(String(cat.ID)==="1"&&q){
       items=visible.filter(x=>String(x.CategoryID)===String(cat.ID));
@@ -1052,7 +1089,7 @@ function sectionHtml(cat,items){
   }else{body=normalCards(items)}
   const iconSrc=resolveImage(cat.Image,'');
   const icon=iconSrc?'<img src="'+esc(iconSrc)+'" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:6px" onerror="this.parentNode.textContent=\''+(DEFAULT_ICONS[cat.Name]||'🍽️')+'\'">':(DEFAULT_ICONS[cat.Name]||'🍽️');
-  const tabs=isPizza?'<div class="pizza-tabs">'+Object.keys(PIZZA_GROUPS).map(n=>'<button class="pizza-tab '+(n===pizzaGroupActive?'active':'')+'" onclick="choosePizzaGroup(\''+esc(n)+'\')">'+esc(n)+'</button>').join('')+'</div>':'';
+  const tabs=isPizza?'<div class="pizza-tabs">'+Object.keys(getPizzaGroups()).map(n=>'<button class="pizza-tab '+(n===pizzaGroupActive?'active':'')+'" onclick="choosePizzaGroup(\''+esc(n)+'\')">'+esc(n)+'</button>').join('')+'</div>':'';
   return '<section class="category-section" id="section-'+esc(String(cat.ID))+'" data-cat-id="'+esc(String(cat.ID))+'"><div class="section-head"><div class="section-title-wrap"><div class="section-icon">'+icon+'</div><h3 class="section-title">'+esc(cat.Name)+'</h3></div><button class="view-all" onclick="chooseCategory(\''+esc(String(cat.ID))+'\')">'+(isPopular?'See All':'Browse')+'</button></div>'+tabs+'<div class="grid">'+body+'</div></section>';
 }
 
