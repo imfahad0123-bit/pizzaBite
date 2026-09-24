@@ -501,6 +501,26 @@ body.in-menu .mobile-cart{opacity:1;visibility:visible;pointer-events:auto}
 .lp-hero-cta{display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;letter-spacing:1px;padding:14px 40px;border-radius:var(--r);min-height:50px;background:#e52323;color:#fff;box-shadow:0 4px 24px rgba(229,35,35,.35);transition:background .2s,transform .15s;touch-action:manipulation}
 .lp-hero-cta:active{transform:scale(.98)}
 
+.lp-featured{padding:24px 0 8px;background:#1a1714}
+.lp-featured-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.lp-feat-card{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:12px;cursor:pointer;transition:transform .15s,background .2s;touch-action:manipulation}
+.lp-feat-card:active{transform:scale(.985);background:rgba(255,255,255,.1)}
+.lp-feat-img{width:84px;height:84px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#2a2420}
+.lp-feat-img img{width:100%;height:100%;object-fit:cover;display:block}
+.lp-feat-body{min-width:0}
+.lp-feat-title{font-size:14px;font-weight:800;color:#faf5ef;margin-bottom:3px}
+.lp-feat-desc{font-size:12px;color:rgba(255,255,255,.65);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lp-feat-cta{display:inline-block;margin-top:6px;font-size:11px;font-weight:800;letter-spacing:.5px;color:#e52323}
+
+.hero-featured{margin-top:14px}
+.hero-feat-card{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.12);transition:transform .15s;touch-action:manipulation}
+.hero-feat-card:active{transform:scale(.985)}
+.hero-feat-img{width:64px;height:64px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#f5e6d0}
+.hero-feat-img img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-feat-title{font-size:13px;font-weight:800;color:var(--text)}
+.hero-feat-desc{font-size:11px;color:var(--muted);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hero-feat-cta{font-size:10px;font-weight:800;color:var(--brand);margin-top:4px;letter-spacing:.4px}
+
 .lp-about{padding:40px 0 36px;background:#1a1714}
 .lp-section-title{font-size:20px;font-weight:800;letter-spacing:-.3px;color:rgba(255,255,255,.9);text-align:center;margin-bottom:22px}
 .lp-about-intro{font-size:14px;font-weight:500;color:rgba(255,255,255,.7);text-align:center;max-width:400px;margin:0 auto 24px;line-height:1.5}
@@ -677,6 +697,12 @@ body.in-menu .mobile-cart{opacity:1;visibility:visible;pointer-events:auto}
   </div>
 </section>
 
+<section class="lp-featured" id="lpFeaturedOffers" style="display:none">
+  <div class="container">
+    <div class="lp-featured-grid" id="lpFeaturedGrid"></div>
+  </div>
+</section>
+
 <section class="lp-about">
   <div class="container">
     <h2 class="lp-section-title" id="lpAboutHeading"></h2>
@@ -791,6 +817,7 @@ body.in-menu .mobile-cart{opacity:1;visibility:visible;pointer-events:auto}
     </div>
   </section>
 
+  <div class="hero-featured" id="menuHeroFeatured" style="display:none"></div>
   <div id="offersBanner"></div>
   <div id="popularSection"></div>
   <div class="cat-bar"><div class="cat-bar-inner" id="categoryBar"></div></div>
@@ -863,7 +890,7 @@ document.addEventListener('click',function(e){
   }
 });
 
-let menu=[],categories=[],cart=[],activeCategory="",pizzaGroups=[],siteConfig={},siteOffers=[],editingKey=null;
+let menu=[],categories=[],cart=[],activeCategory="",pizzaGroups=[],siteConfig={},siteOffers=[],editingKey=null,featuredOffers=[];
 const DEFAULT_ICONS={"Pizzas":"🍕","Burgers":"🍔","Shawarmas":"🌯","Roll Parathas":"🌯","Deals":"🔥","French Fries":"🍟","Crispy Crunch":"🍗","Beverages":"🥤","Super Deals":"🎁","Popular":"⭐","Pasta":"🍝"};
 const DEFAULT_SUBS={"Pizzas":"Freshly prepared with premium toppings.","Burgers":"Juicy favourites made to order.","Shawarmas":"Loaded wraps with savoury fillings.","Roll Parathas":"Hot paratha rolls with hearty fillings.","Deals":"Big value for hungry groups.","French Fries":"Crispy sides for every order.","Crispy Crunch":"Crispy chicken favourites.","Beverages":"Cold drinks and refreshing water.","Super Deals":"Extra value on your favourites.","Popular":"Customer favourites.","Pasta":"Creamy, spicy and delicious."};
 const PIZZA_GROUPS={"Regular":["Chicken Tikka","Chicken Fajita","Chicken Supreme","Hot & Spicy","Chicken Creamy"],"Special":["Chicken Mughlai","Malai Boti","Chicken Achari","Cheese Lover","Euro Bite"],"Crown Crust":["Crown Crust Pizza","Seekh Kabab","Kabab Staifer"]};
@@ -964,6 +991,7 @@ async function loadData(){
     menu=Array.isArray(r.menu)?r.menu.filter(x=>isTrue(x.Available)):[];
     categories=Array.isArray(r.categories)?r.categories.filter(x=>isTrue(x.Active)).sort((a,b)=>Number(a.SortOrder)-Number(b.SortOrder)):[];
     siteOffers=Array.isArray(r.offers)?r.offers.filter(x=>isTrue(x.Active!==undefined?x.Active:true)).sort((a,b)=>Number(a.SortOrder||0)-Number(b.SortOrder||0)):[];
+    featuredOffers=Array.isArray(r.featuredOffers)?r.featuredOffers:[];
     applyExtrasData(Array.isArray(r.extras)?r.extras:[]);
     try{
       const sc=await fetch(API_URL+"?action=subcategories&categoryId=1").then(r=>r.json());
@@ -977,7 +1005,7 @@ async function loadData(){
     }catch(e){pizzaGroupsApi=null}
     const featured=menu.filter(x=>isTrue(x.Featured));
     if(featured.length)categories.unshift({ID:"popular",Name:"Popular",SortOrder:-1,Active:true,Image:"",Subtitle:""});
-    applySiteContent();applyLandingWebsiteConfig();renderOffers();
+    applySiteContent();applyLandingWebsiteConfig();renderOffers();renderFeaturedOffers();
     document.getElementById("menuNote")&&(document.getElementById("menuNote").textContent=menu.length+" live items");
     if(categories.length){activeCategory=String(categories.find(c=>String(c.ID)!=="popular")?.ID||categories[0].ID)}
     renderCategories();render();renderCart();observeSections();
@@ -1019,6 +1047,101 @@ function renderOffers(){
     const imgHtml=img?'<img src="'+esc(img)+'" alt="'+esc(o.Title||o.title||'Offer')+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px" loading="lazy">':"";
     return '<div class="info-strip" style="margin:8px 0;gap:10px;padding:10px 14px">'+imgHtml+'<div><strong style="font-size:13px;color:var(--red)">'+esc(o.Title||o.title||'Special Offer')+'</strong><div style="color:#666;font-size:11px;margin-top:2px">'+esc(o.Description||o.description||'')+'</div></div></div>';
   }).join("");
+}
+
+function featuredByPlacement(place){
+  return featuredOffers.filter(o=>String(o.FeaturedPlacement||"None")===place);
+}
+function featuredCardHtml(o,context){
+  const img=resolveImage(o.FeaturedImage||'','');
+  const imgHtml=img?'<img src="'+esc(img)+'" alt="'+esc(o.Title||'Featured')+'" loading="lazy">':'';
+  const title=esc(o.Title||'Special Offer');
+  const desc=esc(o.Description||'');
+  const dest=o.ctaDestination||null;
+  const ctaLabel=dest&&dest.mode==="item"?"View Item":(dest&&dest.mode==="items"?"View Items":(dest&&(dest.mode==="category"||dest.mode==="subcategory")?"View Menu":"View Offer"));
+  if(context==="landing"){
+    return '<div class="lp-feat-card" data-featured-id="'+esc(String(o.ID||''))+'" onclick="handleFeaturedCta(\''+esc(String(o.ID||''))+'\')">'+
+      '<div class="lp-feat-img">'+imgHtml+'</div>'+
+      '<div class="lp-feat-body"><div class="lp-feat-title">'+title+'</div>'+
+      (desc?'<div class="lp-feat-desc">'+desc+'</div>':'')+
+      '<span class="lp-feat-cta">'+ctaLabel+' →</span></div></div>';
+  }
+  return '<div class="hero-feat-card" data-featured-id="'+esc(String(o.ID||''))+'" onclick="handleFeaturedCta(\''+esc(String(o.ID||''))+'\')">'+
+    '<div class="hero-feat-img">'+imgHtml+'</div>'+
+    '<div><div class="hero-feat-title">'+title+'</div>'+
+    (desc?'<div class="hero-feat-desc">'+desc+'</div>':'')+
+    '<div class="hero-feat-cta">'+ctaLabel+' →</div></div></div>';
+}
+function renderFeaturedOffers(){
+  try{
+    const landingList=featuredByPlacement("LandingPage").concat(featuredByPlacement("Both"));
+    const menuList=featuredByPlacement("MenuHero").concat(featuredByPlacement("Both"));
+    const lpSec=document.getElementById("lpFeaturedOffers");
+    const lpGrid=document.getElementById("lpFeaturedGrid");
+    if(lpSec&&lpGrid){
+      if(landingList.length){
+        lpGrid.innerHTML=landingList.map(o=>featuredCardHtml(o,"landing")).join("");
+        lpSec.style.display="";
+      }else{
+        lpGrid.innerHTML="";
+        lpSec.style.display="none";
+      }
+    }
+    const mh=document.getElementById("menuHeroFeatured");
+    if(mh){
+      if(menuList.length){
+        mh.innerHTML=menuList.map(o=>featuredCardHtml(o,"menu")).join("");
+        mh.style.display="";
+      }else{
+        mh.innerHTML="";
+        mh.style.display="none";
+      }
+    }
+  }catch(e){console.error("featured render",e)}
+}
+function featuredById(id){
+  for(let i=0;i<featuredOffers.length;i++){if(String(featuredOffers[i].ID)===String(id))return featuredOffers[i]}
+  return null;
+}
+function handleFeaturedCta(id){
+  const o=featuredById(id);
+  if(!o)return;
+  const d=o.ctaDestination||{};
+  const mode=d.mode||"general";
+  if(mode==="item"||mode==="items"){
+    const ids=(d.menuItemIds&&d.menuItemIds.length)?d.menuItemIds:(d.highlightItemIds||[]);
+    if(!ids.length){enterMenu();return}
+    enterMenu();
+    setTimeout(function(){
+      if(mode==="item"){
+        const target=menu.find(x=>String(x.ID)===String(ids[0]));
+        if(!target)return;
+        const isPizza=String(target.CategoryID)==="1";
+        if(isPizza){
+          const group=menu.filter(x=>String(x.CategoryID)===String(target.CategoryID)&&String(x.Name).trim()===String(target.Name).trim()).sort((a,b)=>(Number(a.Price)||0)-(Number(b.Price)||0));
+          openPizza(String(target.Name),group.map(x=>({id:String(x.ID),label:String(x.Description||''),price:Number(x.Price)||0})),String(target.ID));
+        }else{
+          openProduct(String(target.ID),false);
+        }
+      }else{
+        const first=ids.map(i=>menu.find(x=>String(x.ID)===String(i))).find(Boolean);
+        if(first){
+          if(d.categoryId){const sec=document.getElementById("section-"+d.categoryId);if(sec)sec.scrollIntoView({behavior:"smooth",block:"start"});chooseCategory(String(d.categoryId))}
+          setTimeout(function(){const card=document.querySelector('[data-menu-id="'+esc(String(ids[0]))+'"]');if(card)card.scrollIntoView({behavior:"smooth",block:"center"})},300);
+        }else{enterMenu()}
+      }
+    },420);
+    return;
+  }
+  if(mode==="category"){
+    enterMenu(d.categoryName||"");
+    return;
+  }
+  if(mode==="subcategory"){
+    enterMenu(d.categoryName||"");
+    return;
+  }
+  enterMenu();
 }
 
 function renderCategories(){
@@ -1120,7 +1243,7 @@ function productCard(x,priceText,isPizza,sizes,sizesHtml){
   const open=esc('openProduct('+JSON.stringify(String(x.ID))+','+(isPizza?'true':'false')+')');
   const btn=isPizza?'<button type="button" class="add" onclick="event.stopPropagation();'+open+'">Select Size</button>':'<button type="button" class="add" onclick="event.stopPropagation();'+open+'">+ Add</button>';
   const desc=x.Description?esc(x.Description):'Freshly made '+esc((cat||'food').toLowerCase())+' · prepared to order';
-  return '<article class="card" tabindex="0" role="button" onclick="'+open+'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();'+open+'}"><div class="art">'+tag+'<img class="product-photo" src="'+photo+'" alt="'+esc(x.Name)+'" loading="lazy" referrerpolicy="no-referrer"></div><div class="card-body"><div class="name">'+esc(x.Name)+'</div><div class="desc">'+desc+'</div>'+(sizesHtml||'')+'<div class="bottom"><span class="price">'+priceText+'</span>'+btn+'</div></div></article>';
+  return '<article class="card" tabindex="0" role="button" data-menu-id="'+esc(String(x.ID))+'" onclick="'+open+'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();'+open+'}"><div class="art">'+tag+'<img class="product-photo" src="'+photo+'" alt="'+esc(x.Name)+'" loading="lazy" referrerpolicy="no-referrer"></div><div class="card-body"><div class="name">'+esc(x.Name)+'</div><div class="desc">'+desc+'</div>'+(sizesHtml||'')+'<div class="bottom"><span class="price">'+priceText+'</span>'+btn+'</div></div></article>';
 }
 function shortSize(s){return s.toLowerCase().includes('small')?'S':s.toLowerCase().includes('regular')?'R':s.toLowerCase().includes('extra large')?'XL':s.toLowerCase().includes('large')?'L':s.toLowerCase().includes('jumbo')?'J':s.toLowerCase().includes('medium')?'M':s.replace(/\s+/g,' ').slice(0,5)}
 function categoryName(id){return (categories.find(c=>String(c.ID)===String(id))||{}).Name||''}
