@@ -24,7 +24,7 @@ a{text-decoration:none;color:inherit}
 img{display:block;max-width:100%}
 
 /* ===== Fulfillment Gate ===== */
-.ff-gate{position:fixed;inset:0;z-index:9999;background:#1a1a1a url('pizza_bite_gate_bg.jpg') center 40% / cover no-repeat;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 20px 48px;transition:opacity .3s ease,visibility .3s ease}
+.ff-gate{position:fixed;inset:0;z-index:9999;background:#1a1a1a url('pizza_bite_gate_bg.jpg') center 40% / cover no-repeat;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px 44px;overflow-y:auto;transition:opacity .3s ease,visibility .3s ease}
 .ff-gate::before{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,.10) 75%,transparent 100%);pointer-events:none}
 .ff-gate.hidden{opacity:0;visibility:hidden;pointer-events:none}
 .ff-gate-card{width:100%;max-width:400px;position:relative;z-index:1}
@@ -39,7 +39,7 @@ img{display:block;max-width:100%}
 .ff-gate-chevron{font-size:12px;color:var(--muted)}
 
 @media(min-width:400px){
-  .ff-gate{padding-bottom:64px}
+  .ff-gate{padding:0 24px}
   .ff-gate-brand{font-size:32px}
   .ff-gate-subtitle{font-size:15px;margin-bottom:32px}
   .ff-gate-choice{padding:24px 14px;min-height:110px;border-radius:16px}
@@ -47,7 +47,7 @@ img{display:block;max-width:100%}
 }
 
 @media(min-width:600px){
-  .ff-gate{background-position:center center;justify-content:center;padding-bottom:0}
+  .ff-gate{background-position:center center;justify-content:center;padding:0 20px;overflow:visible}
   .ff-gate-card{max-width:420px}
   .ff-gate-brand{font-size:36px;letter-spacing:4px;margin-bottom:6px}
   .ff-gate-subtitle{font-size:17px;margin-bottom:36px}
@@ -57,7 +57,7 @@ img{display:block;max-width:100%}
 }
 
 @media(min-width:900px){
-  .ff-gate{background-size:cover;background-position:center 35%}
+  .ff-gate{background-size:cover;background-position:center 35%;padding:0 48px}
   .ff-gate-brand{font-size:40px;letter-spacing:5px;margin-bottom:8px}
   .ff-gate-subtitle{font-size:19px;margin-bottom:40px}
   .ff-gate-card{max-width:460px}
@@ -659,147 +659,73 @@ body.in-menu .mobile-cart{opacity:1;visibility:visible;pointer-events:auto}
 
 <header class="lp-header">
   <div class="lp-header-inner">
-    <a href="#" class="lp-header-brand" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">PIZZA BITE</a>
-    <button class="lp-header-menu-btn" onclick="enterMenu()">MENU</button>
+    <a href="#" class="lp-header-brand" id="lpHeaderBrand" onclick="window.scrollTo({top:0,behavior:'smooth'});return false"></a>
+    <button class="lp-header-menu-btn" id="lpHeaderCta" onclick="enterMenu()"></button>
   </div>
 </header>
 
 <section class="lp-hero">
   <div class="lp-hero-bg">
-    <img src="pizza_bite_gate_bg.jpg" alt="Pizza, shawarma and burger — freshly prepared at Pizza Bite" class="lp-hero-img" loading="eager">
+    <img src="" alt="" class="lp-hero-img" id="lpHeroImg" loading="eager" data-admin-replaceable="hero">
     <div class="lp-hero-overlay"></div>
   </div>
   <div class="lp-hero-content">
-    <h1 class="lp-hero-title"><span>PIZZA</span><br>BITE</h1>
-    <p class="lp-hero-support">Hot pizzas, juicy burgers &amp; loaded shawarmas — made to order in Waisa.</p>
-    <p class="lp-hero-hours">OPEN TODAY · 12 PM – 12 AM</p>
-    <button class="lp-hero-cta" onclick="enterMenu()">MENU</button>
+    <h1 class="lp-hero-title" id="lpHeroTitle"></h1>
+    <p class="lp-hero-support" id="lpHeroSupport"></p>
+    <p class="lp-hero-hours" id="lpHeroHours"></p>
+    <button class="lp-hero-cta" id="lpHeroCta" onclick="enterMenu()"></button>
   </div>
 </section>
 
 <section class="lp-about">
   <div class="container">
-    <h2 class="lp-section-title">About Pizza Bite</h2>
-    <p class="lp-about-intro">A local favourite in Waisa — serving fresh pizzas, juicy burgers, and loaded shawarmas made to order.</p>
-    <div class="lp-about-gallery">
-      <div class="lp-about-img-wrap lp-about-img-wrap--main">
-        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" alt="Inside Pizza Bite restaurant" class="lp-about-img" loading="lazy" data-admin-replaceable="about-main">
-      </div>
-      <div class="lp-about-img-wrap lp-about-img-wrap--side">
-        <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=600&q=80" alt="Pizza Bite kitchen" class="lp-about-img" loading="lazy" data-admin-replaceable="about-side">
-      </div>
-    </div>
+    <h2 class="lp-section-title" id="lpAboutHeading"></h2>
+    <p class="lp-about-intro" id="lpAboutDesc"></p>
+    <div class="lp-about-gallery" id="lpAboutGallery"></div>
   </div>
 </section>
 
 <section class="lp-why">
   <div class="container">
-    <h2 class="lp-section-title">The Pizza Bite Difference</h2>
-    <div class="lp-trust-grid">
-      <div class="lp-trust-card"><div class="lp-trust-icon">&#x1F525;</div><h3 class="lp-trust-label">Made Fresh</h3></div>
-      <div class="lp-trust-card"><div class="lp-trust-icon">&#x1F4B0;</div><h3 class="lp-trust-label">Clear Prices</h3></div>
-      <div class="lp-trust-card"><div class="lp-trust-icon">&#x26A1;</div><h3 class="lp-trust-label">Quick Service</h3></div>
-      <div class="lp-trust-card"><div class="lp-trust-icon">&#x1F69A;</div><h3 class="lp-trust-label">Fast Delivery</h3></div>
-    </div>
+    <h2 class="lp-section-title" id="lpWhyHeading"></h2>
+    <div class="lp-trust-grid" id="lpWhyGrid"></div>
   </div>
 </section>
 
 <section class="lp-how">
   <div class="container">
-    <h2 class="lp-section-title">How to Order</h2>
-    <div class="lp-steps">
-      <div class="lp-step">
-        <div class="lp-step-icon"><img src="menu.png" alt="Menu" class="lp-step-img"></div>
-        <div class="lp-step-label">Choose</div>
-        <div class="lp-step-urdu">&#x645;&#x646;&#x62A;&#x62E;&#x628; &#x6A9;&#x631;&#x6CC;&#x646;</div>
-      </div>
-      <div class="lp-step-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>
-      <div class="lp-step">
-        <div class="lp-step-icon"><img src="add-to-cart.png" alt="Add to Cart" class="lp-step-img"></div>
-        <div class="lp-step-label">Add</div>
-        <div class="lp-step-urdu">&#x6A9;&#x627;&#x631;&#x6BF; &#x645;&#x6CC;&#x646; &#x634;&#x627;&#x645;&#x644; &#x6A9;&#x631;&#x6CC;&#x646;</div>
-      </div>
-      <div class="lp-step-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>
-      <div class="lp-step">
-        <div class="lp-step-icon"><img src="order-now.png" alt="Order" class="lp-step-img"></div>
-        <div class="lp-step-label">Order</div>
-        <div class="lp-step-urdu">&#x622;&#x631;&#x698;&#x631; &#x6A9;&#x631;&#x6CC;&#x646;</div>
-      </div>
-      <div class="lp-step-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>
-      <div class="lp-step">
-        <div class="lp-step-icon"><img src="app.png" alt="Enjoy" class="lp-step-img"></div>
-        <div class="lp-step-label">Enjoy</div>
-        <div class="lp-step-urdu">&#x645;&#x632;&#x647; &#x644;&#x6CC;&#x646;</div>
-      </div>
-    </div>
+    <h2 class="lp-section-title" id="lpHowHeading"></h2>
+    <div class="lp-steps" id="lpHowSteps"></div>
   </div>
 </section>
 
 <section class="lp-categories" id="lpMenu">
   <div class="container">
-    <h2 class="lp-section-title">Explore Our Menu</h2>
-    <div class="lp-cat-grid">
-      <button class="lp-cat-card" onclick="enterMenu('Pizza')">
-        <div class="lp-cat-img-wrap"><img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=400&q=80" alt="Pizza" class="lp-cat-img" loading="lazy"></div>
-        <div class="lp-cat-name">Pizza</div>
-      </button>
-      <button class="lp-cat-card" onclick="enterMenu('Burgers')">
-        <div class="lp-cat-img-wrap"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80" alt="Burgers" class="lp-cat-img" loading="lazy"></div>
-        <div class="lp-cat-name">Burgers</div>
-      </button>
-      <button class="lp-cat-card" onclick="enterMenu('Shawarmas')">
-        <div class="lp-cat-img-wrap"><img src="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=400&q=80" alt="Shawarma" class="lp-cat-img" loading="lazy"></div>
-        <div class="lp-cat-name">Shawarma</div>
-      </button>
-      <button class="lp-cat-card" onclick="enterMenu('Sides')">
-        <div class="lp-cat-img-wrap"><img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=400&q=80" alt="Sides &amp; Drinks" class="lp-cat-img" loading="lazy"></div>
-        <div class="lp-cat-name">Sides &amp; Drinks</div>
-      </button>
-    </div>
+    <h2 class="lp-section-title" id="lpCategoriesHeading"></h2>
+    <div class="lp-cat-grid" id="lpCatGrid"></div>
   </div>
 </section>
 
 <section class="lp-info">
   <div class="container">
-    <h2 class="lp-section-title" style="color:var(--black)">Find Us</h2>
-    <div class="lp-info-grid">
-      <a href="https://maps.google.com/?q=Waisa+Pakistan" target="_blank" rel="noopener" class="lp-info-card">
-        <div class="lp-info-icon">&#x1F4CD;</div>
-        <div class="lp-info-label">Location</div>
-        <div class="lp-info-value">Waisa, Pakistan</div>
-      </a>
-      <div class="lp-info-card">
-        <div class="lp-info-icon">&#x1F550;</div>
-        <div class="lp-info-label">Hours</div>
-        <div class="lp-info-value">12 PM — 12 AM</div>
-      </div>
-      <a href="tel:+923245170776" class="lp-info-card">
-        <div class="lp-info-icon">&#x1F4DE;</div>
-        <div class="lp-info-label">Call Us</div>
-        <div class="lp-info-value">0324-5170776</div>
-      </a>
-      <a href="https://wa.me/923245170776" target="_blank" rel="noopener" class="lp-info-card">
-        <div class="lp-info-icon">&#x1F4AC;</div>
-        <div class="lp-info-label">WhatsApp</div>
-        <div class="lp-info-value">Message Us</div>
-      </a>
-    </div>
+    <h2 class="lp-section-title" id="lpInfoHeading" style="color:var(--black)"></h2>
+    <div class="lp-info-grid" id="lpInfoGrid"></div>
   </div>
 </section>
 
 <section class="lp-final-cta">
   <div class="container">
     <div class="lp-cta-box">
-      <h2 class="lp-cta-heading">Ready for something good?</h2>
-      <button class="lp-cta-button" onclick="enterMenu()">MENU</button>
-      <p class="lp-cta-sub">Fresh pizzas, burgers &amp; shawarmas — made to order.</p>
+      <h2 class="lp-cta-heading" id="lpCtaHeading"></h2>
+      <button class="lp-cta-button" id="lpCtaButton" onclick="enterMenu()"></button>
+      <p class="lp-cta-sub" id="lpCtaSub"></p>
     </div>
   </div>
 </section>
 
 <footer class="lp-site-footer">
-  <p class="lp-site-footer-brand">PIZZA BITE — WAISA</p>
-  <p class="lp-site-footer-contact">0324-5170776 · Free delivery within 3 km</p>
+  <p class="lp-site-footer-brand" id="lpFooterBrand"></p>
+  <p class="lp-site-footer-contact" id="lpFooterContact"></p>
 </footer>
 
 </div><!-- /lpPage -->
@@ -810,17 +736,9 @@ body.in-menu .mobile-cart{opacity:1;visibility:visible;pointer-events:auto}
 <!-- Fulfillment Gate -->
 <div class="ff-gate" id="fulfillmentGate">
   <div class="ff-gate-card">
-    <div class="ff-gate-brand">Pizza Bite</div>
-    <div class="ff-gate-subtitle">What are you having today?</div>
-    <div class="ff-gate-choices">
-      <button class="ff-gate-choice" onclick="selectFulfillment('Delivery')">
-        <div class="ff-gate-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C8102E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/><path d="M15 6a1 1 0 100-2 1 1 0 000 2z" fill="#C8102E" stroke="none"/><path d="M12 17.5V14l-3-3 4-3 2 3h3"/></svg></div>
-        <div class="ff-gate-label">Delivery</div>
-      </button>
-      <button class="ff-gate-choice" onclick="selectFulfillment('Takeaway')">
-        <div class="ff-gate-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C8102E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg></div>
-        <div class="ff-gate-label">Takeaway</div>
-      </button>
+    <div class="ff-gate-brand" id="lpGateBrand">Pizza Bite</div>
+    <div class="ff-gate-subtitle" id="lpGateSubtitle">What are you having today?</div>
+    <div class="ff-gate-choices" id="lpGateChoices">
     </div>
   </div>
 </div>
@@ -1022,7 +940,7 @@ async function loadData(){
     applyExtrasData(Array.isArray(r.extras)?r.extras:[]);
     const featured=menu.filter(x=>isTrue(x.Featured));
     if(featured.length)categories.unshift({ID:"popular",Name:"Popular",SortOrder:-1,Active:true,Image:"",Subtitle:""});
-    applySiteContent();renderOffers();
+    applySiteContent();applyLandingWebsiteConfig();renderOffers();
     document.getElementById("menuNote")&&(document.getElementById("menuNote").textContent=menu.length+" live items");
     if(categories.length){activeCategory=String(categories.find(c=>String(c.ID)!=="popular")?.ID||categories[0].ID)}
     renderCategories();render();renderCart();observeSections();
@@ -1649,17 +1567,20 @@ async function checkOrderStatus(orderId,auto){
 }
 
 // ===== LANDING PAGE JS =====
+function findLandingCategoryMatch(name){
+  var cats=categories||[];
+  var q=String(name||'').toLowerCase();
+  return cats.find(function(c){
+    var n=(c.Name||'').toLowerCase();
+    return n===q||n.indexOf(q)!==-1||q.indexOf(n)!==-1;
+  });
+}
 function enterMenu(category){
   document.body.classList.add('in-menu');
   window.scrollTo(0, 0);
   if(category){
     setTimeout(function(){
-      var cats=categories||[];
-      var match=cats.find(function(c){
-        var n=(c.Name||'').toLowerCase();
-        var q=category.toLowerCase();
-        return n===q||n.indexOf(q)!==-1||q.indexOf(n)!==-1;
-      });
+      var match=findLandingCategoryMatch(category);
       if(match){
         var sec=document.getElementById('section-'+match.ID);
         if(sec){
@@ -1674,6 +1595,351 @@ function backToLanding(){
   document.body.classList.remove('in-menu');
   window.scrollTo(0, 0);
 }
+function landingDefaults(){
+  return {
+    header:{brand:"PIZZA BITE",cta:"MENU"},
+    hero:{
+      titleAccent:"PIZZA",
+      titleMain:"BITE",
+      titleHtml:"",
+      support:"Hot pizzas, juicy burgers & loaded shawarmas — made to order in Waisa.",
+      hours:"OPEN TODAY · 12 PM – 12 AM",
+      cta:"MENU",
+      image:"pizza_bite_gate_bg.jpg",
+      imageAlt:"Pizza, shawarma and burger — freshly prepared at Pizza Bite",
+      imageActive:true
+    },
+    gate:{
+      image:"pizza_bite_gate_bg.jpg",
+      brand:"Pizza Bite",
+      subtitle:"What are you having today?"
+    },
+    about:{
+      heading:"About Pizza Bite",
+      description:"A local favourite in Waisa — serving fresh pizzas, juicy burgers, and loaded shawarmas made to order.",
+      images:[
+        {id:"about-main",placement:"main",image:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80",alt:"Inside Pizza Bite restaurant",active:true,sortOrder:1},
+        {id:"about-side",placement:"side",image:"https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=600&q=80",alt:"Pizza Bite kitchen",active:true,sortOrder:2}
+      ]
+    },
+    why:{
+      heading:"The Pizza Bite Difference",
+      cards:[
+        {id:"made-fresh",icon:"🔥",title:"Made Fresh",active:true,sortOrder:1},
+        {id:"clear-prices",icon:"💰",title:"Clear Prices",active:true,sortOrder:2},
+        {id:"quick-service",icon:"⚡",title:"Quick Service",active:true,sortOrder:3},
+        {id:"fast-delivery",icon:"🚚",title:"Fast Delivery",active:true,sortOrder:4}
+      ]
+    },
+    how:{
+      heading:"How to Order",
+      steps:[
+        {id:"choose",image:"menu.png",imageAlt:"Menu",label:"Choose",urdu:"\u0645\u0646\u062A\u062E\u0628 \u06A9\u0631\u06CC\u0646",active:true,sortOrder:1},
+        {id:"add",image:"add-to-cart.png",imageAlt:"Add to Cart",label:"Add",urdu:"\u06A9\u0627\u0631\u06BF \u0645\u06CC\u0646 \u0634\u0627\u0645\u0644 \u06A9\u0631\u06CC\u0646",active:true,sortOrder:2},
+        {id:"order",image:"order-now.png",imageAlt:"Order",label:"Order",urdu:"\u0622\u0631\u0698\u0631 \u06A9\u0631\u06CC\u0646",active:true,sortOrder:3},
+        {id:"enjoy",image:"app.png",imageAlt:"Enjoy",label:"Enjoy",urdu:"\u0645\u0632\u0647 \u0644\u06CC\u0646",active:true,sortOrder:4}
+      ]
+    },
+    menuCategories:{
+      heading:"Explore Our Menu",
+      items:[
+        {id:"pizza",menuRef:"Pizza",displayName:"Pizza",image:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=400&q=80",alt:"Pizza",active:true,sortOrder:1},
+        {id:"burgers",menuRef:"Burgers",displayName:"Burgers",image:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80",alt:"Burgers",active:true,sortOrder:2},
+        {id:"shawarmas",menuRef:"Shawarmas",displayName:"Shawarma",image:"https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=400&q=80",alt:"Shawarma",active:true,sortOrder:3},
+        {id:"sides",menuRef:"Sides",displayName:"Sides & Drinks",image:"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=400&q=80",alt:"Sides & Drinks",active:true,sortOrder:4}
+      ]
+    },
+    info:{
+      heading:"Find Us",
+      cards:[
+        {id:"location",icon:"📍",label:"Location",value:"Waisa, Pakistan",href:"https://maps.google.com/?q=Waisa+Pakistan",linkTarget:"_blank",active:true,sortOrder:1},
+        {id:"hours",icon:"🕐",label:"Hours",value:"12 PM — 12 AM",href:"",active:true,sortOrder:2},
+        {id:"phone",icon:"📞",label:"Call Us",value:"0324-5170776",href:"tel:+923245170776",active:true,sortOrder:3},
+        {id:"whatsapp",icon:"💬",label:"WhatsApp",value:"Message Us",href:"https://wa.me/923245170776",linkTarget:"_blank",active:true,sortOrder:4}
+      ]
+    },
+    finalCta:{heading:"Ready for something good?",button:"MENU",sub:"Fresh pizzas, burgers & shawarmas — made to order."},
+    footer:{brand:"PIZZA BITE — WAISA",contact:"0324-5170776 · Free delivery within 3 km"}
+  };
+}
+function lpVal(key,fb){
+  const raw=siteConfig[key];
+  if(raw===undefined||raw===null)return fb;
+  if(typeof raw==='string'){
+    const t=raw.trim();
+    if(t==='')return fb;
+    if(t[0]==='['||t[0]==='{'){
+      try{return JSON.parse(t)}catch(e){return fb}
+    }
+    return raw;
+  }
+  return raw;
+}
+function lpDeepMerge(base,over){
+  if(over===undefined||over===null)return base;
+  if(Array.isArray(over))return over;
+  if(typeof over!=='object')return over;
+  const out=Object.assign({},base||{});
+  Object.keys(over).forEach(k=>{out[k]=lpDeepMerge(base?base[k]:undefined,over[k])});
+  return out;
+}
+function buildWebsiteConfig(){
+  const d=landingDefaults();
+  const nested=(siteConfig.landing&&typeof siteConfig.landing==='object'&&!Array.isArray(siteConfig.landing))?siteConfig.landing:{};
+  const merged=lpDeepMerge(d,nested);
+  const setAny=(path,val)=>{
+    if(val===undefined||val===null)return;
+    if(typeof val==='string'&&val.trim()==='')return;
+    const keys=path.split('.');
+    let o=merged;
+    for(let i=0;i<keys.length-1;i++){
+      if(!o[keys[i]]||typeof o[keys[i]]!=='object')o[keys[i]]={};
+      o=o[keys[i]];
+    }
+    o[keys[keys.length-1]]=val;
+  };
+  setAny('header.brand',lpVal('landing_header_brand'));
+  setAny('header.cta',lpVal('landing_header_cta'));
+  setAny('hero.titleAccent',lpVal('landing_hero_title_accent'));
+  setAny('hero.titleMain',lpVal('landing_hero_title_main'));
+  setAny('hero.titleHtml',lpVal('landing_hero_title_html'));
+  setAny('hero.support',lpVal('landing_hero_support'));
+  setAny('hero.hours',lpVal('landing_hero_hours'));
+  setAny('hero.cta',lpVal('landing_hero_cta'));
+  setAny('hero.image',lpVal('landing_hero_image'));
+  setAny('hero.imageAlt',lpVal('landing_hero_image_alt'));
+  setAny('hero.imageActive',lpVal('landing_hero_image_active'));
+  setAny('gate.image',lpVal('landing_gate_image'));
+  setAny('gate.brand',lpVal('landing_gate_brand'));
+  setAny('gate.subtitle',lpVal('landing_gate_subtitle'));
+  setAny('gate.choices',lpVal('landing_gate_choices'));
+  setAny('about.heading',lpVal('landing_about_heading'));
+  setAny('about.description',lpVal('landing_about_description'));
+  setAny('about.images',lpVal('landing_about_images'));
+  setAny('why.heading',lpVal('landing_why_heading'));
+  setAny('why.cards',lpVal('landing_why_cards'));
+  setAny('how.heading',lpVal('landing_how_heading'));
+  setAny('how.steps',lpVal('landing_how_steps'));
+  setAny('menuCategories.heading',lpVal('landing_menu_categories_heading'));
+  setAny('menuCategories.items',lpVal('landing_menu_categories'));
+  setAny('info.heading',lpVal('landing_info_heading'));
+  setAny('info.cards',lpVal('landing_info_cards'));
+  setAny('finalCta.heading',lpVal('landing_cta_heading'));
+  setAny('finalCta.button',lpVal('landing_cta_button'));
+  setAny('finalCta.sub',lpVal('landing_cta_sub'));
+  setAny('footer.brand',lpVal('landing_footer_brand'));
+  setAny('footer.contact',lpVal('landing_footer_contact'));
+  return {landing:merged};
+}
+function lpText(id,val){const el=document.getElementById(id);if(el&&val!=null)el.textContent=String(val)}
+function lpHtml(id,val){const el=document.getElementById(id);if(el&&val!=null)el.innerHTML=String(val)}
+function lpActiveList(arr){
+  return (Array.isArray(arr)?arr:[])
+    .filter(x=>x&&isTrue(x.active!==undefined?x.active:true))
+    .slice()
+    .sort((a,b)=>Number(a.sortOrder||0)-Number(b.sortOrder||0));
+}
+function renderLandingAbout(about){
+  const el=document.getElementById('lpAboutGallery');if(!el)return;
+  el.innerHTML=lpActiveList(about.images).map(img=>{
+    const src=resolveImage(img.image||img.src||img.url||'','');
+    if(!src)return '';
+    const placement=img.placement==='side'?'lp-about-img-wrap--side':'lp-about-img-wrap--main';
+    return '<div class="lp-about-img-wrap '+placement+'"><img src="'+esc(src)+'" alt="'+esc(img.alt||'')+'" class="lp-about-img" loading="lazy" data-admin-replaceable="'+esc(img.id||'')+'"></div>';
+  }).join('');
+}
+function renderLandingWhy(why){
+  const el=document.getElementById('lpWhyGrid');if(!el)return;
+  el.innerHTML=lpActiveList(why.cards).map(c=>
+    '<div class="lp-trust-card"><div class="lp-trust-icon">'+esc(c.icon||'')+'</div><h3 class="lp-trust-label">'+esc(c.title||c.name||'')+'</h3></div>'
+  ).join('');
+}
+function renderLandingHow(how){
+  const el=document.getElementById('lpHowSteps');if(!el)return;
+  const arrow='<div class="lp-step-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>';
+  el.innerHTML=lpActiveList(how.steps).map(s=>{
+    const src=resolveImage(s.image||s.src||s.icon||'','');
+    const imgHtml=src?'<img src="'+esc(src)+'" alt="'+esc(s.imageAlt||s.label||'')+'" class="lp-step-img">':'';
+    return '<div class="lp-step"><div class="lp-step-icon">'+imgHtml+'</div><div class="lp-step-label">'+esc(s.label||s.name||'')+'</div><div class="lp-step-urdu">'+esc(s.urdu||'')+'</div></div>';
+  }).join(arrow);
+}
+function renderLandingMenuCategories(mc){
+  const el=document.getElementById('lpCatGrid');if(!el)return;
+  el.innerHTML=lpActiveList(mc.items).map(it=>{
+    const src=resolveImage(it.image||it.src||it.url||'','');
+    const imgHtml=src?'<img src="'+esc(src)+'" alt="'+esc(it.alt||it.displayName||it.name||'')+'" class="lp-cat-img" loading="lazy">':'';
+    const ref=String(it.menuRef||it.categoryRef||it.id||'');
+    const auth=findLandingCategoryMatch(ref);
+    const label=it.displayName||it.name||(auth?String(auth.Name||''):ref);
+    return '<button class="lp-cat-card" type="button" data-menu-ref="'+esc(ref)+'"'+(auth?' data-category-id="'+esc(String(auth.ID))+'"':'')+' onclick="enterMenu(\''+esc(ref)+'\')"><div class="lp-cat-img-wrap">'+imgHtml+'</div><div class="lp-cat-name">'+esc(label)+'</div></button>';
+  }).join('');
+}
+function renderLandingInfo(info){
+  const el=document.getElementById('lpInfoGrid');if(!el)return;
+  el.innerHTML=lpActiveList(info.cards).map(c=>{
+    const icon='<div class="lp-info-icon">'+esc(c.icon||'')+'</div>';
+    const label='<div class="lp-info-label">'+esc(c.label||c.name||'')+'</div>';
+    const value='<div class="lp-info-value">'+esc(c.value||c.description||'')+'</div>';
+    const href=c.href||c.link||'';
+    if(href){
+      const target=c.linkTarget==='_blank'?' target="_blank" rel="noopener"':'';
+      return '<a href="'+esc(href)+'"'+target+' class="lp-info-card">'+icon+label+value+'</a>';
+    }
+    return '<div class="lp-info-card">'+icon+label+value+'</div>';
+  }).join('');
+}
+
+function renderGateChoices(choices){
+  const el=document.getElementById('lpGateChoices');if(!el)return;
+  const defaultChoices=[
+    {id:'Delivery',label:'Delivery',icon:'delivery',active:true},
+    {id:'Takeaway',label:'Takeaway',icon:'takeaway',active:true}
+  ];
+  const list=lpActiveList(choices).length?lpActiveList(choices):defaultChoices;
+  const icons={
+    delivery:'<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C8102E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/><path d="M15 6a1 1 0 100-2 1 1 0 000 2z" fill="#C8102E" stroke="none"/><path d="M12 17.5V14l-3-3 4-3 2 3h3"/></svg>',
+    takeaway:'<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C8102E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>'
+  };
+  el.innerHTML=list.map(c=>{
+    const iconHtml=icons[c.icon]||'';
+    return '<button class="ff-gate-choice" onclick="selectFulfillment(\''+esc(c.id)+'\')"><div class="ff-gate-icon">'+iconHtml+'</div><div class="ff-gate-label">'+esc(c.label)+'</div></button>';
+  }).join('');
+}
+
+let websiteConfig={landing:null};
+function applyLandingWebsiteConfig(){
+  websiteConfig=buildWebsiteConfig();
+  const L=websiteConfig.landing;
+  // Fallback defaults if no admin data
+  const D={
+    header:{brand:'Pizza Bite',cta:'MENU'},
+    hero:{
+      titleHtml:'<span>PIZZA</span><br>BITE',
+      support:'Hot pizzas, juicy burgers & loaded shawarmas — made to order in Waisa.',
+      hours:'OPEN TODAY · 12 PM – 12 AM',
+      cta:'MENU',
+      image:'pizza_bite_gate_bg.jpg',
+      imageActive:true,
+      imageAlt:'Pizza, shawarma and burger — freshly prepared at Pizza Bite'
+    },
+    gate:{
+      brand:'Pizza Bite',
+      subtitle:'What are you having today?',
+      choices:[
+        {id:'Delivery',label:'Delivery',icon:'delivery',active:true},
+        {id:'Takeaway',label:'Takeaway',icon:'takeaway',active:true}
+      ]
+    },
+    about:{
+      heading:'About Pizza Bite',
+      description:'A local favourite in Waisa — serving fresh pizzas, juicy burgers, and loaded shawarmas made to order.',
+      images:[
+        {image:'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80',alt:'Inside Pizza Bite restaurant',placement:'main',active:true},
+        {image:'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=600&q=80',alt:'Pizza Bite kitchen',placement:'side',active:true}
+      ]
+    },
+    why:{
+      heading:'Why Pizza Bite?',
+      cards:[
+        {icon:'🍕',title:'Fresh Ingredients',active:true,sortOrder:1},
+        {icon:'🚀',title:'Fast Delivery',active:true,sortOrder:2},
+        {icon:'⭐',title:'Top Rated',active:true,sortOrder:3},
+        {icon:'🔥',title:'Made to Order',active:true,sortOrder:4}
+      ]
+    },
+    how:{
+      heading:'How It Works',
+      steps:[
+        {label:'Choose',urdu:'چنیں',image:'',active:true,sortOrder:1},
+        {label:'Order',urdu:'آرڈر دیں',image:'',active:true,sortOrder:2},
+        {label:'Enjoy',urdu:'لطف اٹھائیں',image:'',active:true,sortOrder:3}
+      ]
+    },
+    menuCategories:{
+      heading:'Explore Our Menu',
+      items:[
+        {name:'Pizzas',menuRef:'Pizzas',image:'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=400&q=80',active:true,sortOrder:1},
+        {name:'Burgers',menuRef:'Burgers',image:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80',active:true,sortOrder:2},
+        {name:'Shawarmas',menuRef:'Shawarmas',image:'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=400&q=80',active:true,sortOrder:3},
+        {name:'Sides & Drinks',menuRef:'Sides & Drinks',image:'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=400&q=80',active:true,sortOrder:4}
+      ]
+    },
+    info:{
+      heading:'Good to Know',
+      cards:[
+        {label:'Free Delivery',value:'Within 3 km',icon:'🚚',active:true,sortOrder:1},
+        {label:'Cash on Delivery',value:'Pay at door',icon:'💵',active:true,sortOrder:2},
+        {label:'Hot & Fresh',value:'Made to order',icon:'🔥',active:true,sortOrder:3},
+        {label:'Easy Tracking',value:'Live order status',icon:'📍',active:true,sortOrder:4}
+      ]
+    },
+    finalCta:{
+      heading:'Ready for something good?',
+      button:'ORDER NOW',
+      sub:'0324-5170776 · Free delivery within 3 km'
+    },
+    footer:{
+      brand:'PIZZA BITE',
+      contact:'0324-5170776 · Free home delivery within 3 km'
+    }
+  };
+  // Merge admin data over defaults (shallow merge for each section)
+  const merged={
+    header:{...D.header,...(L.header||{})},
+    hero:{...D.hero,...(L.hero||{})},
+    gate:{...D.gate,...(L.gate||{})},
+    about:{...D.about,...(L.about||{}),images:L.about?.images||D.about.images},
+    why:{...D.why,...(L.why||{}),cards:L.why?.cards||D.why.cards},
+    how:{...D.how,...(L.how||{}),steps:L.how?.steps||D.how.steps},
+    menuCategories:{...D.menuCategories,...(L.menuCategories||{}),items:L.menuCategories?.items||D.menuCategories.items},
+    info:{...D.info,...(L.info||{}),cards:L.info?.cards||D.info.cards},
+    finalCta:{...D.finalCta,...(L.finalCta||{})},
+    footer:{...D.footer,...(L.footer||{})}
+  };
+  const M=merged;
+  lpText('lpHeaderBrand',M.header.brand);
+  lpText('lpHeaderCta',M.header.cta);
+  const heroTitle=M.hero.titleHtml||('<span>'+esc(M.hero.titleAccent)+'</span><br>'+esc(M.hero.titleMain));
+  lpHtml('lpHeroTitle',heroTitle);
+  lpText('lpHeroSupport',M.hero.support);
+  lpText('lpHeroHours',M.hero.hours);
+  lpText('lpHeroCta',M.hero.cta);
+  const heroImg=document.getElementById('lpHeroImg');
+  if(heroImg){
+    const heroSrc=resolveImage(M.hero.image||'','');
+    const heroOn=isTrue(M.hero.imageActive!==undefined?M.hero.imageActive:true)&&!!heroSrc;
+    heroImg.style.display=heroOn?'':'none';
+    if(heroOn){
+      heroImg.src=heroSrc;
+      if(M.hero.imageAlt)heroImg.alt=M.hero.imageAlt;
+    }
+  }
+  const gate=document.getElementById('fulfillmentGate');
+  if(gate){
+    const gateSrc=resolveImage(M.gate.image||'','');
+    gate.style.backgroundImage=gateSrc?'url("'+gateSrc+'")':'none';
+  }
+  lpText('lpGateBrand',M.gate.brand);
+  lpText('lpGateSubtitle',M.gate.subtitle);
+  renderGateChoices(M.gate.choices);
+  lpText('lpAboutHeading',M.about.heading);
+  lpText('lpAboutDesc',M.about.description);
+  renderLandingAbout(M.about);
+  lpText('lpWhyHeading',M.why.heading);
+  renderLandingWhy(M.why);
+  lpText('lpHowHeading',M.how.heading);
+  renderLandingHow(M.how);
+  lpText('lpCategoriesHeading',M.menuCategories.heading);
+  renderLandingMenuCategories(M.menuCategories);
+  lpText('lpInfoHeading',M.info.heading);
+  renderLandingInfo(M.info);
+  lpText('lpCtaHeading',M.finalCta.heading);
+  lpText('lpCtaButton',M.finalCta.button);
+  lpText('lpCtaSub',M.finalCta.sub);
+  lpText('lpFooterBrand',M.footer.brand);
+  lpText('lpFooterContact',M.footer.contact);
+}
+applyLandingWebsiteConfig();
 </script>
 </body>
 </html>
