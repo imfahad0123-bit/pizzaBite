@@ -670,6 +670,57 @@ body.in-menu .mobile-cart{opacity:1;visibility:visible;pointer-events:auto}
 .lp-hero-hours{font-size:11px;margin-bottom:14px}
 .lp-hero-cta{padding:12px 28px;min-height:44px;font-size:13px}
 }
+
+/* ===== Deals tab, promotion price display & delivery area picker ===== */
+.price-block{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.price-old{text-decoration:line-through;color:var(--muted);font-weight:700;font-size:11px;line-height:1.2}
+.price-now{font-weight:900;color:var(--text);white-space:nowrap}
+.promo-badge{display:inline-block;margin-top:3px;background:var(--brand);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.3px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.promo-badge.conditional{background:#8a5a12}
+.deal-tag{position:absolute;top:6px;right:6px;background:linear-gradient(135deg,#f5a623,#f57c00);color:#fff;font-size:9px;font-weight:900;padding:3px 7px;border-radius:6px;letter-spacing:.4px;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+
+.deal-hero{display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:start}
+.deal-hero-img{height:80px;border-radius:10px;overflow:hidden;background:#f5e4d2}
+.deal-hero-img img{width:100%;height:100%;object-fit:cover;display:block}
+.deal-title{margin:0 0 2px;font-size:14px;font-weight:900;color:var(--text);line-height:1.15}
+.deal-desc{color:var(--muted);font-size:10px;line-height:1.35}
+.deal-inc-title{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;color:var(--text);margin:10px 0 5px}
+.deal-components{display:grid;gap:5px}
+.deal-comp{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:12px;padding-bottom:5px;border-bottom:1px dashed var(--line)}
+.deal-comp:last-child{border-bottom:none}
+.deal-comp .dc-qty{font-weight:900;color:var(--brand);min-width:24px;flex-shrink:0}
+.deal-comp .dc-name{flex:1;min-width:0;color:var(--text);font-weight:700}
+.deal-comp .dc-price{font-weight:800;color:var(--muted);white-space:nowrap;font-size:11px}
+.deal-price-box{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--cream);border:1px dashed var(--line);border-radius:10px;padding:8px 10px;margin-top:8px}
+.deal-price-side{display:flex;align-items:baseline;flex-wrap:wrap}
+.deal-price-now{font-size:16px;font-weight:900;color:var(--brand)}
+.deal-price-old{text-decoration:line-through;color:var(--muted);font-weight:800;font-size:12px;margin-right:6px}
+.deal-save-chip{background:#e8f7ee;color:#157a3d;font-size:10px;font-weight:900;padding:3px 7px;border-radius:6px;white-space:nowrap}
+.deal-empty{padding:14px 4px;font-size:12px;color:var(--muted);text-align:center}
+.add-deal{width:100%;margin-top:8px;background:linear-gradient(135deg,var(--brand) 0%,var(--brand-dark) 100%);color:#fff;padding:11px;border-radius:12px;font-weight:900;font-size:13px;min-height:44px;border:none;touch-action:manipulation;transition:all .15s ease}
+.add-deal:active{transform:scale(.98)}
+
+.hero-feat-card.compact{padding:7px 10px;gap:8px;align-items:center}
+.hero-feat-card.compact .hero-feat-img{width:42px;height:42px;border-radius:8px}
+.hero-feat-card.compact .hero-feat-title{font-size:12px}
+.hero-feat-card.compact .hero-feat-desc{display:none}
+.hero-feat-card.compact .hero-feat-cta{font-size:10px;font-weight:800}
+.hero-featured .hero-feat-card+.hero-feat-card{margin-top:8px}
+
+.area-wrap{position:relative;display:block}
+.area-list{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--white);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.16);max-height:172px;overflow:auto;z-index:40;display:none;-webkit-overflow-scrolling:touch}
+.area-list.open{display:block}
+.area-opt{display:block;width:100%;text-align:left;padding:9px 11px;font-size:12px;font-weight:700;background:none;border:none;border-bottom:1px solid var(--line);color:var(--text);cursor:pointer;min-height:38px;touch-action:manipulation}
+.area-opt:last-child{border-bottom:none}
+.area-opt:hover,.area-opt:active{background:var(--cream)}
+.area-opt small{display:block;font-weight:600;font-size:10px;color:var(--muted)}
+.area-empty{padding:9px 11px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--line)}
+
+@media(max-width:400px){
+.deal-hero{grid-template-columns:70px 1fr}
+.deal-comp{font-size:11px}
+.deal-price-now{font-size:15px}
+}
 </style>
 </head>
 <body>
@@ -837,7 +888,8 @@ body.in-menu .mobile-cart{opacity:1;visibility:visible;pointer-events:auto}
 <div class="modal-wrap" id="cartModal"><div class="modal"><div class="mh"><h3>Your Cart</h3><button class="close" onclick="closeModal('cartModal')">×</button></div><div class="mb" id="cartModalBody"></div></div></div>
 <div class="modal-wrap product-modal" id="productModal"><div class="modal"><div class="mh"><h3 id="productTitle">Product Details</h3><button class="close" onclick="closeModal('productModal')">×</button></div><div class="mb" id="productBody"></div></div></div>
 <div class="modal-wrap" id="pizzaModal"><div class="modal"><div class="mh"><h3 id="pizzaTitle">Choose your pizza size</h3><button class="close" onclick="closeModal('pizzaModal')">×</button></div><div class="mb" id="pizzaBody"></div></div></div>
-<div class="modal-wrap" id="checkoutModal"><div class="modal"><div class="mh"><h3>Checkout</h3><button class="close" onclick="closeModal('checkoutModal')">×</button></div><div class="mb"><form class="form" id="checkoutForm"><label>Full Name<input name="customerName" required placeholder="Your name"></label><label>Phone Number<input name="phone" required inputmode="tel" placeholder="03XXXXXXXXX"></label><label>Delivery Address<textarea name="address" required placeholder="House, street, landmark…"></textarea></label><label>Area / Mohalla *<input name="area" required placeholder="Area name"></label><label>Payment Method<select name="paymentMethod"><option>Cash on Delivery</option></select></label><label>Order Notes<textarea name="notes" placeholder="Optional instructions"></textarea></label><div class="cart-summary" id="checkoutSummary"></div><button class="checkout" type="submit">Place Order</button><div class="secure">🔒 Secure checkout · Cash on Delivery</div></form></div></div></div>
+<div class="modal-wrap" id="dealModal"><div class="modal"><div class="mh"><h3 id="dealTitle">Deal</h3><button class="close" onclick="closeModal('dealModal')">×</button></div><div class="mb" id="dealBody"></div></div></div>
+<div class="modal-wrap" id="checkoutModal"><div class="modal"><div class="mh"><h3>Checkout</h3><button class="close" onclick="closeModal('checkoutModal')">×</button></div><div class="mb"><form class="form" id="checkoutForm"><label>Full Name<input name="customerName" required placeholder="Your name"></label><label>Phone Number<input name="phone" required inputmode="tel" placeholder="03XXXXXXXXX"></label><label>Delivery Address<textarea name="address" required placeholder="House, street, landmark…"></textarea></label><label>Delivery Area *<span class="area-wrap"><input name="area" id="areaInput" required autocomplete="off" placeholder="Search your area..."><input type="hidden" name="areaId" id="areaIdInput" value=""><div class="area-list" id="areaList"></div></span></label><label>Payment Method<select name="paymentMethod"><option>Cash on Delivery</option></select></label><label>Order Notes<textarea name="notes" placeholder="Optional instructions"></textarea></label><div class="cart-summary" id="checkoutSummary"></div><button class="checkout" type="submit">Place Order</button><div class="secure">🔒 Secure checkout · Cash on Delivery</div></form></div></div></div>
 <div class="modal-wrap" id="successModal"><div class="modal"><div id="successContent"></div></div></div>
 <div class="modal-wrap" id="trackingModal"><div class="modal"><div class="mh"><h3>Your Orders</h3><button class="close" onclick="closeModal('trackingModal')">×</button></div><div class="mb" id="trackingContent"></div></div></div>
 
@@ -890,7 +942,7 @@ document.addEventListener('click',function(e){
   }
 });
 
-let menu=[],categories=[],cart=[],activeCategory="",pizzaGroups=[],siteConfig={},siteOffers=[],editingKey=null,featuredOffers=[];
+let menu=[],categories=[],cart=[],activeCategory="",pizzaGroups=[],siteConfig={},siteOffers=[],editingKey=null,featuredOffers=[],deliveryAreasData=[],offerDisplayMap={};
 const DEFAULT_ICONS={"Pizzas":"🍕","Burgers":"🍔","Shawarmas":"🌯","Roll Parathas":"🌯","Deals":"🔥","French Fries":"🍟","Crispy Crunch":"🍗","Beverages":"🥤","Super Deals":"🎁","Popular":"⭐","Pasta":"🍝"};
 const DEFAULT_SUBS={"Pizzas":"Freshly prepared with premium toppings.","Burgers":"Juicy favourites made to order.","Shawarmas":"Loaded wraps with savoury fillings.","Roll Parathas":"Hot paratha rolls with hearty fillings.","Deals":"Big value for hungry groups.","French Fries":"Crispy sides for every order.","Crispy Crunch":"Crispy chicken favourites.","Beverages":"Cold drinks and refreshing water.","Super Deals":"Extra value on your favourites.","Popular":"Customer favourites.","Pasta":"Creamy, spicy and delicious."};
 const PIZZA_GROUPS={"Regular":["Chicken Tikka","Chicken Fajita","Chicken Supreme","Hot & Spicy","Chicken Creamy"],"Special":["Chicken Mughlai","Malai Boti","Chicken Achari","Cheese Lover","Euro Bite"],"Crown Crust":["Crown Crust Pizza","Seekh Kabab","Kabab Staifer"]};
@@ -990,9 +1042,11 @@ async function loadData(){
     siteConfig=r&&r.settings?r.settings:{};
     menu=Array.isArray(r.menu)?r.menu.filter(x=>isTrue(x.Available)):[];
     categories=Array.isArray(r.categories)?r.categories.filter(x=>isTrue(x.Active)).sort((a,b)=>Number(a.SortOrder)-Number(b.SortOrder)):[];
-    siteOffers=Array.isArray(r.offers)?r.offers.filter(x=>isTrue(x.Active!==undefined?x.Active:true)).sort((a,b)=>Number(a.SortOrder||0)-Number(b.SortOrder||0)):[];
+    siteOffers=Array.isArray(r.offers)?r.offers.filter(offerIsLive):[];
     featuredOffers=Array.isArray(r.featuredOffers)?r.featuredOffers:[];
     applyExtrasData(Array.isArray(r.extras)?r.extras:[]);
+    try{await loadDeliveryAreas()}catch(e){deliveryAreasData=[]}
+    try{buildOfferDisplayMap()}catch(e){offerDisplayMap={}}
     try{
       const sc=await fetch(API_URL+"?action=subcategories&categoryId=1").then(r=>r.json());
       if(sc&&sc.success&&Array.isArray(sc.subcategories)){
@@ -1049,6 +1103,226 @@ function renderOffers(){
   }).join("");
 }
 
+/* ===== Deal / Bundle offers (single source of truth: the Offers catalog) ===== */
+function offerIsLive(o){
+  if(!o)return false;
+  if(!isTrue(o.Active!==undefined?o.Active:true))return false;
+  if(String(o.Archived||'').toLowerCase()==='true')return false;
+  const st=String(o.Status||'').trim();
+  if(st==='Draft'||st==='Paused'||st==='Archived')return false;
+  if(st&&st!=='Live'&&st!=='Scheduled')return false;
+  return true;
+}
+function parseBundleDef(raw){
+  if(raw===undefined||raw===null||raw==='')return null;
+  let arr;try{arr=typeof raw==='string'?JSON.parse(raw):raw}catch(e){return null}
+  if(!Array.isArray(arr)||!arr.length)return null;
+  const out=[];const seen={};
+  for(let i=0;i<arr.length;i++){
+    const c=arr[i]||{};
+    const menuId=String(c.menuId===undefined||c.menuId===null?'':c.menuId).trim();
+    const qty=Number(c.quantity);
+    if(!menuId)return null;
+    if(!isFinite(qty)||qty<=0||qty!==Math.floor(qty))return null;
+    if(seen[menuId])return null;
+    seen[menuId]=true;
+    out.push({menuId:menuId,quantity:qty});
+  }
+  return out;
+}
+function isDealOffer(o){return String((o&&o.DiscountType)||'').trim()==='Bundle'}
+function showOriginalFlag(o){const v=String((o&&o.ShowOriginalPrice)||'').toLowerCase();return o&&o.ShowOriginalPrice===true||v==='true'||v==='1'||v==='yes'}
+function dealOffersList(withSearch){
+  let list=siteOffers.filter(o=>{
+    if(!isDealOffer(o))return false;
+    if(!offerIsLive(o))return false;
+    if(!parseBundleDef(o.BundleDefinitionJSON))return false;
+    return true;
+  });
+  if(withSearch){
+    const q=(document.getElementById('search')?document.getElementById('search').value:'').toLowerCase().trim();
+    if(q)list=list.filter(o=>((String(o.Title||'')+' '+String(o.Description||'')).toLowerCase().indexOf(q)!==-1));
+  }
+  return list;
+}
+function dealComponents(deal){
+  const comps=parseBundleDef(deal.BundleDefinitionJSON)||[];
+  const out=[];
+  for(let i=0;i<comps.length;i++){
+    const m=menu.find(x=>String(x.ID)===String(comps[i].menuId));
+    if(!m)continue;
+    out.push({menuId:String(m.ID),quantity:comps[i].quantity,name:String(m.Name||''),variant:String(m.Description||''),price:Number(m.Price)||0,category:categoryName(m.CategoryID)});
+  }
+  return out;
+}
+function dealNormalValue(deal){return dealComponents(deal).reduce((s,c)=>s+c.price*c.quantity,0)}
+function dealCardHtml(o){
+  const comps=dealComponents(o);
+  const first=comps[0]||null;
+  const price=Number(o.BundlePrice)||Number(o.DiscountValue)||0;
+  const normal=dealNormalValue(o);
+  const so=showOriginalFlag(o);
+  const photo=first?productImage(first.category,first.name,first.menuId):resolveImage(o.FeaturedImage||'','');
+  const tag='<span class="deal-tag">DEAL</span>';
+  const priceHtml=(so&&normal>price)
+    ?'<span class="price-block"><span class="price-old">Rs. '+money(normal)+'</span><span class="price-now">Rs. '+money(price)+'</span></span>'
+    :'<span class="price">Rs. '+money(price)+'</span>';
+  const btn='<button type="button" class="add" onclick="event.stopPropagation();openDeal(\''+esc(String(o.ID))+'\')">View Deal</button>';
+  const desc=esc(String(o.Description||'')||('Includes '+comps.length+' items'));
+  const open=esc('openDeal('+JSON.stringify(String(o.ID))+')');
+  return '<article class="card deal-card" tabindex="0" role="button" data-deal-id="'+esc(String(o.ID))+'" onclick="'+open+'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();'+open+'}"><div class="art">'+tag+'<img class="product-photo" src="'+photo+'" alt="'+esc(o.Title||'Deal')+'" loading="lazy" referrerpolicy="no-referrer"></div><div class="card-body"><div class="name">'+esc(String(o.Title||'Deal'))+'</div><div class="desc">'+desc+'</div><div class="bottom">'+priceHtml+btn+'</div></div></article>';
+}
+function dealsSectionHtml(list){
+  if(!list.length)return '';
+  return '<section class="category-section deals-section" id="section-deals" data-cat-id="deals"><div class="section-head"><div class="section-title-wrap"><div class="section-icon">'+(DEFAULT_ICONS['Deals']||'🔥')+'</div><h3 class="section-title">Deals</h3></div></div><div class="grid">'+list.map(dealCardHtml).join('')+'</div></section>';
+}
+function openDeal(id){
+  const o=siteOffers.find(x=>String(x.ID)===String(id));
+  if(!o)return;
+  const comps=dealComponents(o);
+  if(!comps.length)return;
+  const price=Number(o.BundlePrice)||Number(o.DiscountValue)||0;
+  const normal=dealNormalValue(o);
+  const so=showOriginalFlag(o);
+  const first=comps[0];
+  const photo=productImage(first.category,first.name,first.menuId);
+  const compHtml=comps.map(c=>'<div class="deal-comp"><span class="dc-qty">×'+c.quantity+'</span><span class="dc-name">'+esc(c.name)+(c.variant?' — '+esc(c.variant):'')+'</span><span class="dc-price">Rs. '+money(c.price*c.quantity)+'</span></div>').join('');
+  const priceBox='<div class="deal-price-box"><div class="deal-price-side">'+((so&&normal>price)?'<span class="deal-price-old">Rs. '+money(normal)+'</span>':'')+'<span class="deal-price-now">Rs. '+money(price)+'</span></div>'+((so&&normal>price)?'<span class="deal-save-chip">Save Rs. '+money(normal-price)+'</span>':'')+'</div>';
+  document.getElementById('dealTitle').textContent=String(o.Title||'Deal');
+  document.getElementById('dealBody').innerHTML='<div class="deal-hero"><div class="deal-hero-img"><img src="'+photo+'" alt="'+esc(o.Title||'Deal')+'" loading="eager" referrerpolicy="no-referrer"></div><div><div class="deal-title">'+esc(String(o.Title||'Deal'))+'</div>'+(o.Description?'<div class="deal-desc">'+esc(String(o.Description))+'</div>':'')+'</div></div><div class="deal-inc-title">This deal includes</div><div class="deal-components">'+compHtml+'</div>'+priceBox+'<button type="button" class="add-deal" onclick="addDeal(\''+esc(String(o.ID))+'\')">ADD DEAL</button>';
+  openModal('dealModal');
+}
+function addDeal(id){
+  const o=siteOffers.find(x=>String(x.ID)===String(id));
+  if(!o)return;
+  const comps=dealComponents(o);
+  if(!comps.length)return;
+  comps.forEach(c=>{
+    const cat=String(c.category||'');
+    addLine({key:makeCartKey(cat,c.menuId,null),itemId:String(c.menuId),name:c.name,variant:c.variant,quantity:c.quantity,price:c.price,category:cat});
+  });
+  closeModal('dealModal');
+  showToast('Deal added',comps.length+' real menu item'+(comps.length===1?'':'s')+' from the deal are in your cart.');
+}
+
+/* ===== Delivery areas (searchable picker uses the authoritative Area ID) ===== */
+function areaRowIsActive(x){const v=String(x.Active!==undefined?x.Active:true).toLowerCase();return !(v==='false'||v==='0'||v==='no')}
+async function loadDeliveryAreas(){
+  const r=await fetch(API_URL+"?action=deliveryAreas").then(r=>r.json());
+  const rows=Array.isArray(r)?r:((r&&r.areas)?r.areas:((r&&r.deliveryAreas)?r.deliveryAreas:[]));
+  deliveryAreasData=rows.filter(areaRowIsActive).map(x=>({id:String(x.ID!==undefined&&x.ID!==null?x.ID:(x.Id!==undefined?x.Id:(x.id!==undefined?x.id:''))),name:String(x.AreaName||x.Name||x.areaName||'').trim(),fee:Number(x.DeliveryFee)||0})).filter(a=>a.id&&a.name);
+}
+function renderAreaList(filter){
+  const el=document.getElementById('areaList');
+  if(!el)return;
+  const q=String(filter||'').toLowerCase().trim();
+  const rows=deliveryAreasData.filter(a=>!q||a.name.toLowerCase().indexOf(q)!==-1);
+  let html=rows.map(a=>'<button type="button" class="area-opt" data-area-id="'+esc(a.id)+'" data-area-name="'+esc(a.name)+'">'+esc(a.name)+'<small>Delivery fee Rs. '+money(a.fee)+'</small></button>').join('');
+  if(deliveryAreasData.length&&!rows.length)html+='<div class="area-empty">No match found — pick "Other / Not Listed" below.</div>';
+  html+='<button type="button" class="area-opt" data-area-id="" data-area-name="Other / Not Listed">Other / Not Listed<small>We will use the standard delivery fee</small></button>';
+  el.innerHTML=html;
+  el.classList.add('open');
+}
+function closeAreaList(){const el=document.getElementById('areaList');if(el)el.classList.remove('open')}
+function pickArea(id,name){
+  const input=document.getElementById('areaInput');
+  const hidden=document.getElementById('areaIdInput');
+  if(input)input.value=name;
+  if(hidden)hidden.value=id||'';
+  closeAreaList();
+}
+
+/* ===== Item promotion price display (display only — the server prices every order) ===== */
+function offerDateIso_(v){
+  if(v===null||v===undefined||v==='')return '';
+  if(Object.prototype.toString.call(v)==='[object Date]'){const d=v;return isNaN(d.getTime())?'':d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+  const s=String(v).trim();
+  if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);
+  const d=new Date(s);
+  if(!isNaN(d.getTime()))return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  return '';
+}
+function hmToMinutes_(hm){const m=String(hm||'').match(/^(\d{1,2}):(\d{2})/);if(!m)return null;const h=Number(m[1]),mi=Number(m[2]);if(!isFinite(h)||!isFinite(mi)||h<0||h>23||mi<0||mi>59)return null;return h*60+mi}
+function offerWithinDisplayWindow_(o){
+  const now=new Date();
+  const todayIso=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  const s=offerDateIso_(o.StartDate),e=offerDateIso_(o.EndDate);
+  if(s&&todayIso<s)return false;
+  if(e&&todayIso>e)return false;
+  const sh=hmToMinutes_(o.StartTime),eh=hmToMinutes_(o.EndTime);
+  if(sh===null&&eh===null)return true;
+  const a=sh===null?0:sh,b=eh===null?24*60-1:eh;
+  const nowMin=now.getHours()*60+now.getMinutes();
+  if(a<=b)return nowMin>=a&&nowMin<=b;
+  return nowMin>=a||nowMin<=b;
+}
+function offerDisplayEligible_(o){
+  if(!offerIsLive(o))return false;
+  if(!offerWithinDisplayWindow_(o))return false;
+  const usageLimit=Number(o.UsageLimit)||0;
+  if(usageLimit>0&&(Number(o.UsageCount)||0)>=usageLimit)return false;
+  return true;
+}
+function offerTargetMatchesMenu_(o,item){
+  const t=String(o.TargetType||'All').trim()||'All';
+  if(t==='All')return true;
+  const ids=String(o.TargetIDs||'').split(',').map(s=>s.trim()).filter(Boolean);
+  if(!ids.length)return false;
+  if(t==='Item')return ids.indexOf(String(item.ID))!==-1;
+  if(t==='Category')return ids.indexOf(String(item.CategoryID))!==-1;
+  if(t==='Subcategory')return ids.indexOf(String(item.SubcategoryID||item.SubcategoryId||''))!==-1;
+  if(t==='Extra')return false;
+  return false;
+}
+function buildOfferDisplayMap(){
+  const map={};
+  siteOffers.forEach(o=>{
+    if(!offerDisplayEligible_(o))return;
+    const type=String(o.DiscountType||'').trim();
+    if(type==='Bundle')return;
+    if(type!=='Percent'&&type!=='Flat')return;
+    if(String(o.PromoType||'Food').trim()!=='Food')return;
+    const value=Number(o.DiscountValue)||0;
+    if(!(value>0))return;
+    const conditional=(Number(o.MinimumOrder)||0)>0||String(o.DeliveryAreaIDs||'').trim()!=='';
+    const showOriginal=showOriginalFlag(o);
+    menu.forEach(item=>{
+      if(!isTrue(item.Available))return;
+      if(!offerTargetMatchesMenu_(o,item))return;
+      const base=Number(item.Price)||0;
+      if(!(base>0))return;
+      const saving=type==='Percent'?Math.round(base*Math.min(100,value)/100):Math.min(value,base);
+      const discounted=Math.max(0,base-saving);
+      if(!(saving>0))return;
+      const key=String(item.ID);
+      const prev=map[key];
+      const entry={
+        discounted:discounted,
+        original:base,
+        conditional:conditional,
+        safe:!conditional,
+        showOriginal:showOriginal,
+        badge:type==='Percent'?Math.min(100,Math.round(value))+'% OFF':'Rs. '+money(value)+' OFF',
+        offerId:String(o.ID)
+      };
+      if(!prev||saving>prev.original-prev.discounted)map[key]=entry;
+    });
+  });
+  offerDisplayMap=map;
+}
+function promoForItem(id){return offerDisplayMap[String(id)]||null}
+function priceHtmlFor(x,normalText){
+  const promo=promoForItem(String(x.ID));
+  if(!promo)return '<span class="price">'+esc(normalText)+'</span>';
+  const badge='<span class="promo-badge'+(promo.safe?'':' conditional')+'">'+esc(promo.badge)+'</span>';
+  if(!promo.safe){
+    // Conditional offer (min order / delivery area / etc.): show the offer badge, never a guaranteed final price.
+    return '<span class="price-block"><span class="price">'+esc(normalText)+'</span>'+badge+'</span>';
+  }
+  const crossed=(promo.showOriginal&&promo.original>promo.discounted)?'<span class="price-old">Rs. '+money(promo.original)+'</span>':'';
+  return '<span class="price-block">'+crossed+'<span class="price-now">Rs. '+money(promo.discounted)+'</span>'+badge+'</span>';
+}
+
 function featuredByPlacement(place){
   return featuredOffers.filter(o=>String(o.FeaturedPlacement||"None")===place);
 }
@@ -1058,7 +1332,8 @@ function featuredCardHtml(o,context){
   const title=esc(o.Title||'Special Offer');
   const desc=esc(o.Description||'');
   const dest=o.ctaDestination||null;
-  const ctaLabel=dest&&dest.mode==="item"?"View Item":(dest&&dest.mode==="items"?"View Items":(dest&&(dest.mode==="category"||dest.mode==="subcategory")?"View Menu":"View Offer"));
+  const isDeal=isDealOffer(o)||(dest&&dest.mode==="deal");
+  const ctaLabel=isDeal?"View Deal":(dest&&dest.mode==="item"?"View Item":(dest&&dest.mode==="items"?"View Items":(dest&&(dest.mode==="category"||dest.mode==="subcategory")?"View Menu":(String(o.PromoType||"Food").trim()==="Delivery"?"View Menu":"View Offer"))));
   if(context==="landing"){
     return '<div class="lp-feat-card" data-featured-id="'+esc(String(o.ID||''))+'" onclick="handleFeaturedCta(\''+esc(String(o.ID||''))+'\')">'+
       '<div class="lp-feat-img">'+imgHtml+'</div>'+
@@ -1066,7 +1341,8 @@ function featuredCardHtml(o,context){
       (desc?'<div class="lp-feat-desc">'+desc+'</div>':'')+
       '<span class="lp-feat-cta">'+ctaLabel+' →</span></div></div>';
   }
-  return '<div class="hero-feat-card" data-featured-id="'+esc(String(o.ID||''))+'" onclick="handleFeaturedCta(\''+esc(String(o.ID||''))+'\')">'+
+  // Menu Hero: compact banner (same Offer, one record — never a second full card).
+  return '<div class="hero-feat-card compact" data-featured-id="'+esc(String(o.ID||''))+'" onclick="handleFeaturedCta(\''+esc(String(o.ID||''))+'\')">'+
     '<div class="hero-feat-img">'+imgHtml+'</div>'+
     '<div><div class="hero-feat-title">'+title+'</div>'+
     (desc?'<div class="hero-feat-desc">'+desc+'</div>':'')+
@@ -1107,7 +1383,16 @@ function handleFeaturedCta(id){
   const o=featuredById(id);
   if(!o)return;
   const d=o.ctaDestination||{};
-  const mode=d.mode||"general";
+  const mode=(d.mode==="deal"||isDealOffer(o))?"deal":(d.mode||"general");
+  if(mode==="deal"){
+    // Featured Deal -> Menu opens, Deals tab selected, then that deal's popup.
+    enterMenu();
+    setTimeout(function(){
+      chooseCategory('deals');
+      setTimeout(function(){openDeal(String(o.ID));},340);
+    },420);
+    return;
+  }
   if(mode==="item"||mode==="items"){
     const ids=(d.menuItemIds&&d.menuItemIds.length)?d.menuItemIds:(d.highlightItemIds||[]);
     if(!ids.length){enterMenu();return}
@@ -1147,6 +1432,9 @@ function handleFeaturedCta(id){
 function renderCategories(){
   const bar=document.getElementById("categoryBar");
   let html='';
+  if(dealOffersList(false).length){
+    html+='<button class="cat-pill '+(activeCategory==='deals'?'active':'')+'" data-cat="deals" onclick="chooseCategory(\'deals\')">'+(DEFAULT_ICONS['Deals']||'🔥')+' Deals</button>';
+  }
   categories.filter(c=>String(c.ID)!=="popular"&&!/extra/i.test(c.Name)).forEach(c=>{
     html+='<button class="cat-pill '+(activeCategory===String(c.ID)?'active':'')+'" data-cat="'+esc(String(c.ID))+'" onclick="chooseCategory(\''+esc(String(c.ID))+'\')">'+(DEFAULT_ICONS[c.Name]||'🍽️')+' '+esc(c.Name)+'</button>';
   });
@@ -1176,6 +1464,7 @@ function render(){
   const visible=menu.filter(x=>`${x.Name||''} ${x.Description||''}`.toLowerCase().includes(q));
   const popularSections=[];
   const menuSections=[];
+  const deals=dealOffersList(true);
   categories.forEach(cat=>{
     if(String(cat.ID)==="9")return;
     let items;
@@ -1195,6 +1484,7 @@ function render(){
     if(String(cat.ID)==="popular"){popularSections.push(sectionHtml(cat,items))}
     else{menuSections.push(sectionHtml(cat,items))}
   });
+  if(deals.length)menuSections.push(dealsSectionHtml(deals));
   document.getElementById("popularSection").innerHTML=popularSections.join("");
   document.getElementById("menuSections").innerHTML=menuSections.join("")||'<div style="padding:24px;text-align:center;color:#888">No matching items found.</div>';
   requestAnimationFrame(observeSections);
@@ -1243,7 +1533,8 @@ function productCard(x,priceText,isPizza,sizes,sizesHtml){
   const open=esc('openProduct('+JSON.stringify(String(x.ID))+','+(isPizza?'true':'false')+')');
   const btn=isPizza?'<button type="button" class="add" onclick="event.stopPropagation();'+open+'">Select Size</button>':'<button type="button" class="add" onclick="event.stopPropagation();'+open+'">+ Add</button>';
   const desc=x.Description?esc(x.Description):'Freshly made '+esc((cat||'food').toLowerCase())+' · prepared to order';
-  return '<article class="card" tabindex="0" role="button" data-menu-id="'+esc(String(x.ID))+'" onclick="'+open+'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();'+open+'}"><div class="art">'+tag+'<img class="product-photo" src="'+photo+'" alt="'+esc(x.Name)+'" loading="lazy" referrerpolicy="no-referrer"></div><div class="card-body"><div class="name">'+esc(x.Name)+'</div><div class="desc">'+desc+'</div>'+(sizesHtml||'')+'<div class="bottom"><span class="price">'+priceText+'</span>'+btn+'</div></div></article>';
+  const priceHtml=priceHtmlFor(x,priceText);
+  return '<article class="card" tabindex="0" role="button" data-menu-id="'+esc(String(x.ID))+'" onclick="'+open+'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();'+open+'}"><div class="art">'+tag+'<img class="product-photo" src="'+photo+'" alt="'+esc(x.Name)+'" loading="lazy" referrerpolicy="no-referrer"></div><div class="card-body"><div class="name">'+esc(x.Name)+'</div><div class="desc">'+desc+'</div>'+(sizesHtml||'')+'<div class="bottom">'+priceHtml+btn+'</div></div></article>';
 }
 function shortSize(s){return s.toLowerCase().includes('small')?'S':s.toLowerCase().includes('regular')?'R':s.toLowerCase().includes('extra large')?'XL':s.toLowerCase().includes('large')?'L':s.toLowerCase().includes('jumbo')?'J':s.toLowerCase().includes('medium')?'M':s.replace(/\s+/g,' ').slice(0,5)}
 function categoryName(id){return (categories.find(c=>String(c.ID)===String(id))||{}).Name||''}
@@ -1425,10 +1716,31 @@ function openCart(){if(!window.matchMedia('(max-width:900px)').matches){const p=
 function closeCartPopover(){const p=document.getElementById('cartPopover');p.classList.remove('open');document.querySelector('.cart-head').setAttribute('aria-expanded','false')}
 function startCheckout(){if(!cart.length)return;closeModal('cartModal');const t=totals();document.getElementById('checkoutSummary').innerHTML='<div class="sumrow"><span>Subtotal</span><strong>Rs. '+money(t.subtotal)+'</strong></div><div class="sumrow"><span>Delivery</span><strong>'+esc(cfg('delivery_fee_label','FREE'))+'</strong></div><div class="sumrow total"><span>Total</span><strong>Rs. '+money(t.total)+'</strong></div>';openModal('checkoutModal')}
 
-document.getElementById('checkoutForm').addEventListener('submit',async e=>{e.preventDefault();if(!cart.length)return;const f=new FormData(e.target);const idKey=sessionStorage.getItem('pb_checkout_idempotency')||('WEB-'+Date.now()+'-'+Math.random().toString(36).slice(2,10));sessionStorage.setItem('pb_checkout_idempotency',idKey);const baseNotes=String(f.get('notes')||'').trim();const payload={idempotencyKey:idKey,customerName:String(f.get('customerName')||'').trim(),phone:String(f.get('phone')||'').trim(),address:String(f.get('address')||'').trim(),area:String(f.get('area')||'').trim(),paymentMethod:String(f.get('paymentMethod')||'Cash on Delivery'),notes:baseNotes,orderSource:'Website',fulfillmentType:fulfillmentType,items:cart.filter(x=>x.category!=='Extras').map(x=>{const item={itemId:x.itemId,quantity:x.quantity};if(Array.isArray(x.extras)&&x.extras.length)item.extras=x.extras.map(ex=>({itemId:ex.itemId,group:ex.group||ex.name||'',label:ex.label||ex.variant||'',quantity:ex.quantity||1}));return item})};const b=e.target.querySelector('button[type=submit]');b.disabled=true;b.textContent='Placing order…';try{const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});const j=await r.json();if(!j.success)throw new Error(j.error||'Order failed');sessionStorage.removeItem('pb_checkout_idempotency');closeModal('checkoutModal');saveTrackedOrder(j.orderId||'Pizza Bite Order',j.trackingToken||'');renderSuccessPlaced(j.orderId||'Pizza Bite Order');playSuccessSound();cart=[];e.target.reset();renderCart()}catch(err){console.error(err);const m=String(err.message||'');const safe=!/Failed to fetch|Unexpected token|NetworkError|SyntaxError/i.test(m)&&m!=='Order failed'&&m?m:'We could not place the order right now. Please try again.';alert(safe+'. The same checkout can be retried safely.')}finally{b.disabled=false;b.textContent='Place Order'}});
+document.getElementById('checkoutForm').addEventListener('submit',async e=>{e.preventDefault();if(!cart.length)return;const f=new FormData(e.target);const idKey=sessionStorage.getItem('pb_checkout_idempotency')||('WEB-'+Date.now()+'-'+Math.random().toString(36).slice(2,10));sessionStorage.setItem('pb_checkout_idempotency',idKey);const baseNotes=String(f.get('notes')||'').trim();const payload={idempotencyKey:idKey,customerName:String(f.get('customerName')||'').trim(),phone:String(f.get('phone')||'').trim(),address:String(f.get('address')||'').trim(),area:String(f.get('area')||'').trim(),areaId:String(f.get('areaId')||'').trim(),paymentMethod:String(f.get('paymentMethod')||'Cash on Delivery'),notes:baseNotes,orderSource:'Website',fulfillmentType:fulfillmentType,items:cart.filter(x=>x.category!=='Extras').map(x=>{const item={itemId:x.itemId,quantity:x.quantity};if(Array.isArray(x.extras)&&x.extras.length)item.extras=x.extras.map(ex=>({itemId:ex.itemId,group:ex.group||ex.name||'',label:ex.label||ex.variant||'',quantity:ex.quantity||1}));return item})};const b=e.target.querySelector('button[type=submit]');b.disabled=true;b.textContent='Placing order…';try{const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});const j=await r.json();if(!j.success)throw new Error(j.error||'Order failed');sessionStorage.removeItem('pb_checkout_idempotency');closeModal('checkoutModal');saveTrackedOrder(j.orderId||'Pizza Bite Order',j.trackingToken||'');renderSuccessPlaced(j.orderId||'Pizza Bite Order');playSuccessSound();cart=[];e.target.reset();renderCart()}catch(err){console.error(err);const m=String(err.message||'');const safe=!/Failed to fetch|Unexpected token|NetworkError|SyntaxError/i.test(m)&&m!=='Order failed'&&m?m:'We could not place the order right now. Please try again.';alert(safe+'. The same checkout can be retried safely.')}finally{b.disabled=false;b.textContent='Place Order'}});
 document.querySelectorAll('#checkoutForm input, #checkoutForm textarea, #checkoutForm select').forEach(function(el){el.addEventListener('focus',function(){setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'center'})},350)})});
 
 let toastTimer=null;
+/* ===== Delivery area searchable picker (uses Area IDs, never typed spellings) ===== */
+document.addEventListener('focusin',function(e){
+  if(e.target&&e.target.id==='areaInput')renderAreaList(e.target.value);
+});
+document.addEventListener('input',function(e){
+  if(e.target&&e.target.id==='areaInput'){
+    const hidden=document.getElementById('areaIdInput');
+    if(hidden)hidden.value='';
+    renderAreaList(e.target.value);
+  }
+});
+document.addEventListener('click',function(e){
+  const opt=e.target&&e.target.closest?e.target.closest('.area-opt'):null;
+  if(opt){
+    pickArea(opt.getAttribute('data-area-id')||'',opt.getAttribute('data-area-name')||'');
+    return;
+  }
+  const wrap=e.target&&e.target.closest?e.target.closest('.area-wrap'):null;
+  if(!wrap)closeAreaList();
+});
+
 function showToast(title,text){const toast=document.getElementById('toast');document.getElementById('toastTitle').textContent=title;document.getElementById('toastText').textContent=text;toast.classList.remove('show');void toast.offsetWidth;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),2600)}
 function playAddSound(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const ctx=new C();const now=ctx.currentTime;const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(660,now);o.frequency.exponentialRampToValueAtTime(920,now+.12);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.18,now+.012);g.gain.exponentialRampToValueAtTime(.0001,now+.16);o.connect(g).connect(ctx.destination);o.start(now);o.stop(now+.18);setTimeout(()=>ctx.close().catch(()=>{}),250)}catch(e){}}
 function playSuccessSound(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const ctx=new C();const now=ctx.currentTime;[523.25,659.25,783.99].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,now+i*.08);g.gain.exponentialRampToValueAtTime(.15,now+i*.08+.01);g.gain.exponentialRampToValueAtTime(.0001,now+i*.08+.16);o.connect(g).connect(ctx.destination);o.start(now+i*.08);o.stop(now+i*.08+.18)});setTimeout(()=>ctx.close().catch(()=>{}),450)}catch(e){}}
