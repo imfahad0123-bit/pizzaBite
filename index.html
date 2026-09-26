@@ -699,6 +699,16 @@ body.in-menu .mobile-cart{opacity:1;visibility:visible;pointer-events:auto}
 .deal-empty{padding:14px 4px;font-size:12px;color:var(--muted);text-align:center}
 .add-deal{width:100%;margin-top:8px;background:linear-gradient(135deg,var(--brand) 0%,var(--brand-dark) 100%);color:#fff;padding:11px;border-radius:12px;font-weight:900;font-size:13px;min-height:44px;border:none;touch-action:manipulation;transition:all .15s ease}
 .add-deal:active{transform:scale(.98)}
+.deal-stack-chip{margin-top:8px;padding:8px 10px;border-radius:10px;font-size:12px;font-weight:800;text-align:center}
+.deal-stack-chip.on{background:rgba(46,160,67,.12);border:1px solid rgba(46,160,67,.45);color:#2ea043}
+.deal-stack-chip.off{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.4);color:#f85149}
+.deal-qty-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:10px}
+.deal-qty-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--cream);font-weight:900;font-size:18px;line-height:1;cursor:pointer;touch-action:manipulation}
+.deal-qty-num{min-width:32px;text-align:center;font-weight:900;font-size:18px}
+.deal-remove-btn{width:100%;margin-top:8px;background:transparent;border:1px solid var(--line);color:#f85149;padding:10px;border-radius:12px;font-weight:800;font-size:13px;min-height:44px;cursor:pointer;touch-action:manipulation}
+.deal-price-row{font-size:12px;color:var(--muted);margin-top:6px}
+.deal-price-row strong{color:var(--brand);font-weight:900}
+.cart-line-deal .deal-components{margin-top:6px}
 
 .hero-feat-card.compact{padding:7px 10px;gap:8px;align-items:center}
 .hero-feat-card.compact .hero-feat-img{width:42px;height:42px;border-radius:8px}
@@ -1095,12 +1105,7 @@ function applySiteContent(){
 }
 function renderOffers(){
   const el=document.getElementById("offersBanner");
-  if(!siteOffers.length){el.innerHTML="";return}
-  el.innerHTML=siteOffers.map(o=>{
-    const img=resolveImage(o.Image||o.image||'','');
-    const imgHtml=img?'<img src="'+esc(img)+'" alt="'+esc(o.Title||o.title||'Offer')+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px" loading="lazy">':"";
-    return '<div class="info-strip" style="margin:8px 0;gap:10px;padding:10px 14px">'+imgHtml+'<div><strong style="font-size:13px;color:var(--red)">'+esc(o.Title||o.title||'Special Offer')+'</strong><div style="color:#666;font-size:11px;margin-top:2px">'+esc(o.Description||o.description||'')+'</div></div></div>';
-  }).join("");
+  if(el)el.innerHTML="";
 }
 
 /* ===== Deal / Bundle offers (single source of truth: the Offers catalog) ===== */
@@ -1176,7 +1181,9 @@ function dealsSectionHtml(list){
   if(!list.length)return '';
   return '<section class="category-section deals-section" id="section-deals" data-cat-id="deals"><div class="section-head"><div class="section-title-wrap"><div class="section-icon">'+(DEFAULT_ICONS['Deals']||'🔥')+'</div><h3 class="section-title">Deals</h3></div></div><div class="grid">'+list.map(dealCardHtml).join('')+'</div></section>';
 }
-function openDeal(id){
+let dealEditKey=null,dealEditQty=1;
+function getDealMax(o){const n=Math.floor(Number(o.MaxBundlesPerOrder)||1);return n>0?n:1}
+function openDeal(id,editKey){
   const o=siteOffers.find(x=>String(x.ID)===String(id));
   if(!o)return;
   const comps=dealComponents(o);
@@ -1188,21 +1195,79 @@ function openDeal(id){
   const photo=productImage(first.category,first.name,first.menuId);
   const compHtml=comps.map(c=>'<div class="deal-comp"><span class="dc-qty">×'+c.quantity+'</span><span class="dc-name">'+esc(c.name)+(c.variant?' — '+esc(c.variant):'')+'</span><span class="dc-price">Rs. '+money(c.price*c.quantity)+'</span></div>').join('');
   const priceBox='<div class="deal-price-box"><div class="deal-price-side">'+((so&&normal>price)?'<span class="deal-price-old">Rs. '+money(normal)+'</span>':'')+'<span class="deal-price-now">Rs. '+money(price)+'</span></div>'+((so&&normal>price)?'<span class="deal-save-chip">Save Rs. '+money(normal-price)+'</span>':'')+'</div>';
+  const fdLive=siteOffers.some(x=>offerIsLive(x)&&String(x.PromoType||'Food').trim()==='Delivery');
+  const chip=fdLive?(isTrue(o.StackWithDelivery)
+    ?'<div class="deal-stack-chip on">This deal can be combined with Free Delivery</div>'
+    :'<div class="deal-stack-chip off">Free Delivery cannot be combined with this deal</div>'):'';
+  let actionHtml='';
+  if(editKey){
+    const line=cart.find(x=>x.key===editKey);
+    if(!line||!line.isDeal)return;
+    dealEditKey=editKey;
+    dealEditQty=Math.max(1,Number(line.quantity)||1);
+    actionHtml='<div class="deal-qty-row"><button type="button" class="deal-qty-btn" onclick="bumpDealQty(-1)">−</button><span class="deal-qty-num" id="dealEditQty">'+dealEditQty+'</span><button type="button" class="deal-qty-btn" onclick="bumpDealQty(1)">+</button></div><button type="button" class="add-deal" onclick="updateDeal()">UPDATE DEAL</button><button type="button" class="deal-remove-btn" onclick="removeDealFromCart(\''+esc(editKey)+'\')">Remove Deal</button>';
+  }else{
+    dealEditKey=null;
+    dealEditQty=1;
+    actionHtml='<button type="button" class="add-deal" onclick="addDeal(\''+esc(String(o.ID))+'\')">ADD DEAL</button>';
+  }
   document.getElementById('dealTitle').textContent=String(o.Title||'Deal');
-  document.getElementById('dealBody').innerHTML='<div class="deal-hero"><div class="deal-hero-img"><img src="'+photo+'" alt="'+esc(o.Title||'Deal')+'" loading="eager" referrerpolicy="no-referrer"></div><div><div class="deal-title">'+esc(String(o.Title||'Deal'))+'</div>'+(o.Description?'<div class="deal-desc">'+esc(String(o.Description))+'</div>':'')+'</div></div><div class="deal-inc-title">This deal includes</div><div class="deal-components">'+compHtml+'</div>'+priceBox+'<button type="button" class="add-deal" onclick="addDeal(\''+esc(String(o.ID))+'\')">ADD DEAL</button>';
+  document.getElementById('dealBody').innerHTML='<div class="deal-hero"><div class="deal-hero-img"><img src="'+photo+'" alt="'+esc(o.Title||'Deal')+'" loading="eager" referrerpolicy="no-referrer"></div><div><div class="deal-title">'+esc(String(o.Title||'Deal'))+'</div>'+(o.Description?'<div class="deal-desc">'+esc(String(o.Description))+'</div>':'')+'</div></div><div class="deal-inc-title">This deal includes</div><div class="deal-components">'+compHtml+'</div>'+priceBox+chip+actionHtml;
   openModal('dealModal');
+}
+function bumpDealQty(delta){
+  if(!dealEditKey)return;
+  const line=cart.find(x=>x.key===dealEditKey);
+  if(!line)return;
+  const o=siteOffers.find(x=>String(x.ID)===String(line.dealId));
+  const max=o?getDealMax(o):1;
+  dealEditQty=Math.max(1,Math.min(max,dealEditQty+delta));
+  const el=document.getElementById('dealEditQty');
+  if(el)el.textContent=String(dealEditQty);
+}
+function updateDeal(){
+  if(!dealEditKey)return;
+  const line=cart.find(x=>x.key===dealEditKey);
+  if(!line){dealEditKey=null;closeModal('dealModal');return}
+  line.quantity=dealEditQty;
+  dealEditKey=null;
+  renderCart();
+  closeModal('dealModal');
+  showToast('Deal updated',String(line.name)+' quantity is now '+line.quantity+'.');
+}
+function removeDealFromCart(key){
+  removeLine(key);
+  dealEditKey=null;
+  closeModal('dealModal');
+  showToast('Deal removed','The deal was removed from your cart.');
+}
+function editDealCart(key){
+  const item=cart.find(x=>x.key===key);
+  if(!item||!item.isDeal)return;
+  openDeal(item.dealId,key);
 }
 function addDeal(id){
   const o=siteOffers.find(x=>String(x.ID)===String(id));
   if(!o)return;
   const comps=dealComponents(o);
   if(!comps.length)return;
-  comps.forEach(c=>{
-    const cat=String(c.category||'');
-    addLine({key:makeCartKey(cat,c.menuId,null),itemId:String(c.menuId),name:c.name,variant:c.variant,quantity:c.quantity,price:c.price,category:cat});
-  });
+  const dealKey='deal:'+String(o.ID);
+  const existing=cart.find(x=>x.key===dealKey);
+  const max=getDealMax(o);
+  const nextQty=(existing?Number(existing.quantity):0)+1;
+  if(nextQty>max){
+    showToast('Limit reached','This deal can be added up to '+max+' time'+(max===1?'':'s')+' per order.');
+    return;
+  }
+  const price=Number(o.BundlePrice)||Number(o.DiscountValue)||0;
+  if(existing){
+    existing.quantity=nextQty;
+    cartAddFx();
+  }else{
+    addLine({key:dealKey,itemId:'deal:'+String(o.ID),name:String(o.Title||'Deal'),variant:'Combo Deal',quantity:1,price:price,category:'Deals',isDeal:true,dealId:String(o.ID),comps:comps});
+  }
   closeModal('dealModal');
-  showToast('Deal added',comps.length+' real menu item'+(comps.length===1?'':'s')+' from the deal are in your cart.');
+  showToast('Deal added',String(o.Title||'Deal')+' is in your cart as one grouped deal.');
 }
 
 /* ===== Delivery areas (searchable picker uses the authoritative Area ID) ===== */
@@ -1336,14 +1401,14 @@ function featuredCardHtml(o,context){
   const ctaLabel=isDeal?"View Deal":(dest&&dest.mode==="item"?"View Item":(dest&&dest.mode==="items"?"View Items":(dest&&(dest.mode==="category"||dest.mode==="subcategory")?"View Menu":(String(o.PromoType||"Food").trim()==="Delivery"?"View Menu":"View Offer"))));
   if(context==="landing"){
     return '<div class="lp-feat-card" data-featured-id="'+esc(String(o.ID||''))+'" onclick="handleFeaturedCta(\''+esc(String(o.ID||''))+'\')">'+
-      '<div class="lp-feat-img">'+imgHtml+'</div>'+
+      (img?'<div class="lp-feat-img">'+imgHtml+'</div>':'')+
       '<div class="lp-feat-body"><div class="lp-feat-title">'+title+'</div>'+
       (desc?'<div class="lp-feat-desc">'+desc+'</div>':'')+
       '<span class="lp-feat-cta">'+ctaLabel+' →</span></div></div>';
   }
   // Menu Hero: compact banner (same Offer, one record — never a second full card).
   return '<div class="hero-feat-card compact" data-featured-id="'+esc(String(o.ID||''))+'" onclick="handleFeaturedCta(\''+esc(String(o.ID||''))+'\')">'+
-    '<div class="hero-feat-img">'+imgHtml+'</div>'+
+    (img?'<div class="hero-feat-img">'+imgHtml+'</div>':'')+
     '<div><div class="hero-feat-title">'+title+'</div>'+
     (desc?'<div class="hero-feat-desc">'+desc+'</div>':'')+
     '<div class="hero-feat-cta">'+ctaLabel+' →</div></div></div>';
@@ -1661,6 +1726,7 @@ function makeCartKey(category,itemId,extras){
 function editCartItem(key){
   var item=cart.find(function(x){return x.key===key});
   if(!item)return;
+  if(item.isDeal){editDealCart(key);return}
   editingKey=key;
   if(item.category==='Pizzas'){
     var mi=menu.find(function(x){return String(x.ID)===String(item.itemId)});
@@ -1703,12 +1769,13 @@ function editCartItem(key){
   }
 }
 
-function addLine(line){const found=cart.find(x=>x.key===line.key);if(found)found.quantity+=Number(line.quantity||1);else cart.push({...line,quantity:Number(line.quantity||1)});renderCart();closeCartPopover();const cc=document.getElementById('cartCount');cc.classList.remove('bump');void cc.offsetWidth;cc.classList.add('bump');const head=document.querySelector('.cart-head');head.classList.remove('cart-pulse');void head.offsetWidth;head.classList.add('cart-pulse');playAddSound()}
+function cartAddFx(){renderCart();closeCartPopover();const cc=document.getElementById('cartCount');cc.classList.remove('bump');void cc.offsetWidth;cc.classList.add('bump');const head=document.querySelector('.cart-head');head.classList.remove('cart-pulse');void head.offsetWidth;head.classList.add('cart-pulse');playAddSound()}
+function addLine(line){const found=cart.find(x=>x.key===line.key);if(found)found.quantity+=Number(line.quantity||1);else cart.push({...line,quantity:Number(line.quantity||1)});cartAddFx()}
 function qty(key,delta){const x=cart.find(a=>a.key===key);if(!x)return;x.quantity+=delta;if(x.quantity<=0)cart=cart.filter(a=>a.key!==key);renderCart()}
 function removeLine(key){cart=cart.filter(a=>a.key!==key);renderCart()}
 function clearCart(){if(!cart.length)return;cart=[];renderCart()}
 function totals(){const subtotal=cart.reduce((s,x)=>{let line=x.price*x.quantity;if(Array.isArray(x.extras))line+=x.extras.reduce((es,ex)=>es+(ex.price||0)*(ex.quantity||1),0)*x.quantity;return s+line},0);return{subtotal,delivery:0,discount:0,total:subtotal}}
-function cartItemsHtml(){if(!cart.length)return '<div class="empty-cart"><span class="empty-ico">🛒</span><strong>Your cart is empty.</strong><small>Add something delicious!</small></div>';return cart.map(x=>{const noteHtml=x.note?'<div class="cart-note">Special: '+esc(x.note)+'</div>':'';let extrasHtml='';let extrasTotal=0;if(Array.isArray(x.extras)&&x.extras.length){extrasTotal=x.extras.reduce((es,ex)=>es+(ex.price||0)*(ex.quantity||1),0);extrasHtml='<div class="cart-extras">'+x.extras.map(ex=>'<div class="cart-extra-line">+ '+esc(ex.name)+' ('+esc(ex.variant)+')</div>').join('')+'</div>';}const lineTotal=x.price*x.quantity+extrasTotal*x.quantity;const trashSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'; const editSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'; return '<div class="cart-line"><div class="thumb"><img class="cart-photo" src="'+productImage(x.category,x.name,x.itemId)+'" alt="'+esc(x.name)+'" loading="lazy" referrerpolicy="no-referrer"></div><div><div class="cart-name">'+esc(x.name)+'</div><div class="cart-meta">'+esc(x.variant)+'</div>'+noteHtml+extrasHtml+'<div class="line-row"><div class="qty"><button onclick="qty(\''+esc(x.key)+'\',-1)">−</button><span>'+x.quantity+'</span><button onclick="qty(\''+esc(x.key)+'\',1)">+</button></div><span class="line-price">Rs. '+money(lineTotal)+'</span></div><div style="text-align:right;margin-top:2px;display:flex;gap:4px;justify-content:flex-end"><button class="edit-btn" onclick="editCartItem(\''+esc(x.key)+'\')">'+editSvg+' Edit</button><button class="remove" onclick="removeLine(\''+esc(x.key)+'\')">'+trashSvg+' Remove</button></div></div></div>'}).join('')}
+function cartItemsHtml(){if(!cart.length)return '<div class="empty-cart"><span class="empty-ico">🛒</span><strong>Your cart is empty.</strong><small>Add something delicious!</small></div>';return cart.map(x=>{if(x.isDeal){const dealCompsHtml=(Array.isArray(x.comps)?x.comps:[]).map(c=>'<div class="deal-comp"><span class="dc-qty">×'+c.quantity+'</span><span class="dc-name">'+esc(c.name)+(c.variant?' — '+esc(c.variant):'')+'</span></div>').join('');const dc=(Array.isArray(x.comps)&&x.comps.length)?x.comps[0]:null;const dealThumb=dc?productImage(dc.category,dc.name,dc.menuId):productImage(x.category,x.name,x.itemId);const dealLineTotal=x.price*x.quantity;const dealTrashSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';const dealEditSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';return '<div class="cart-line cart-line-deal"><div class="thumb"><img class="cart-photo" src="'+dealThumb+'" alt="'+esc(x.name)+'" loading="lazy" referrerpolicy="no-referrer"></div><div><div class="cart-name">'+esc(x.name)+'</div><div class="cart-meta">'+esc(x.variant||'Combo Deal')+'</div><div class="deal-components">'+dealCompsHtml+'</div><div class="deal-price-row">Deal Price: <strong>Rs. '+money(x.price)+'</strong></div><div class="line-row"><div class="qty"><button onclick="qty(\''+esc(x.key)+'\',-1)">−</button><span>'+x.quantity+'</span><button onclick="qty(\''+esc(x.key)+'\',1)">+</button></div><span class="line-price">Rs. '+money(dealLineTotal)+'</span></div><div style="text-align:right;margin-top:2px;display:flex;gap:4px;justify-content:flex-end"><button class="edit-btn" onclick="editDealCart(\''+esc(x.key)+'\')">'+dealEditSvg+' Edit Deal</button><button class="remove" onclick="removeLine(\''+esc(x.key)+'\')">'+dealTrashSvg+' Remove</button></div></div></div>'}const noteHtml=x.note?'<div class="cart-note">Special: '+esc(x.note)+'</div>':'';let extrasHtml='';let extrasTotal=0;if(Array.isArray(x.extras)&&x.extras.length){extrasTotal=x.extras.reduce((es,ex)=>es+(ex.price||0)*(ex.quantity||1),0);extrasHtml='<div class="cart-extras">'+x.extras.map(ex=>'<div class="cart-extra-line">+ '+esc(ex.name)+' ('+esc(ex.variant)+')</div>').join('')+'</div>';}const lineTotal=x.price*x.quantity+extrasTotal*x.quantity;const trashSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'; const editSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'; return '<div class="cart-line"><div class="thumb"><img class="cart-photo" src="'+productImage(x.category,x.name,x.itemId)+'" alt="'+esc(x.name)+'" loading="lazy" referrerpolicy="no-referrer"></div><div><div class="cart-name">'+esc(x.name)+'</div><div class="cart-meta">'+esc(x.variant)+'</div>'+noteHtml+extrasHtml+'<div class="line-row"><div class="qty"><button onclick="qty(\''+esc(x.key)+'\',-1)">−</button><span>'+x.quantity+'</span><button onclick="qty(\''+esc(x.key)+'\',1)">+</button></div><span class="line-price">Rs. '+money(lineTotal)+'</span></div><div style="text-align:right;margin-top:2px;display:flex;gap:4px;justify-content:flex-end"><button class="edit-btn" onclick="editCartItem(\''+esc(x.key)+'\')">'+editSvg+' Edit</button><button class="remove" onclick="removeLine(\''+esc(x.key)+'\')">'+trashSvg+' Remove</button></div></div></div>'}).join('')}
 function summaryHtml(){const t=totals();return '<div class="cart-summary"><div class="sumrow"><span>Subtotal</span><strong>Rs. '+money(t.subtotal)+'</strong></div><div class="sumrow"><span>Delivery</span><strong>'+esc(cfg('delivery_fee_label','FREE'))+'</strong></div><div class="sumrow total"><span>Total</span><strong>Rs. '+money(t.total)+'</strong></div>'+(cart.length?'<button class="checkout" onclick="startCheckout()">'+esc(cfg('checkout_button_text','Proceed to Checkout →'))+'</button>':'')+'<div class="secure">🔒 Secure checkout · Cash on Delivery</div></div>'}
 function renderCart(){const count=cart.reduce((s,x)=>s+x.quantity,0),t=totals();document.getElementById('cartCount').textContent=count;document.getElementById('mobileCount').textContent=count+' item'+(count===1?'':'s');document.getElementById('mobileTotal').textContent='Rs. '+money(t.total);document.getElementById('cartPopoverBody').innerHTML=cartItemsHtml()+summaryHtml();document.getElementById('cartModalBody').innerHTML=cartItemsHtml()+summaryHtml();const mc=document.querySelector('.mobile-cart');if(mc){if(cart.length>0){mc.classList.remove('cart-empty')}else{mc.classList.add('cart-empty')}}}
 function toggleCart(){if(window.matchMedia('(max-width:900px)').matches){openCart();return}const p=document.getElementById('cartPopover');const btn=document.querySelector('.cart-head');const open=p.classList.toggle('open');btn.setAttribute('aria-expanded',open?'true':'false');renderCart()}
@@ -1716,7 +1783,7 @@ function openCart(){if(!window.matchMedia('(max-width:900px)').matches){const p=
 function closeCartPopover(){const p=document.getElementById('cartPopover');p.classList.remove('open');document.querySelector('.cart-head').setAttribute('aria-expanded','false')}
 function startCheckout(){if(!cart.length)return;closeModal('cartModal');const t=totals();document.getElementById('checkoutSummary').innerHTML='<div class="sumrow"><span>Subtotal</span><strong>Rs. '+money(t.subtotal)+'</strong></div><div class="sumrow"><span>Delivery</span><strong>'+esc(cfg('delivery_fee_label','FREE'))+'</strong></div><div class="sumrow total"><span>Total</span><strong>Rs. '+money(t.total)+'</strong></div>';openModal('checkoutModal')}
 
-document.getElementById('checkoutForm').addEventListener('submit',async e=>{e.preventDefault();if(!cart.length)return;const f=new FormData(e.target);const idKey=sessionStorage.getItem('pb_checkout_idempotency')||('WEB-'+Date.now()+'-'+Math.random().toString(36).slice(2,10));sessionStorage.setItem('pb_checkout_idempotency',idKey);const baseNotes=String(f.get('notes')||'').trim();const payload={idempotencyKey:idKey,customerName:String(f.get('customerName')||'').trim(),phone:String(f.get('phone')||'').trim(),address:String(f.get('address')||'').trim(),area:String(f.get('area')||'').trim(),areaId:String(f.get('areaId')||'').trim(),paymentMethod:String(f.get('paymentMethod')||'Cash on Delivery'),notes:baseNotes,orderSource:'Website',fulfillmentType:fulfillmentType,items:cart.filter(x=>x.category!=='Extras').map(x=>{const item={itemId:x.itemId,quantity:x.quantity};if(Array.isArray(x.extras)&&x.extras.length)item.extras=x.extras.map(ex=>({itemId:ex.itemId,group:ex.group||ex.name||'',label:ex.label||ex.variant||'',quantity:ex.quantity||1}));return item})};const b=e.target.querySelector('button[type=submit]');b.disabled=true;b.textContent='Placing order…';try{const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});const j=await r.json();if(!j.success)throw new Error(j.error||'Order failed');sessionStorage.removeItem('pb_checkout_idempotency');closeModal('checkoutModal');saveTrackedOrder(j.orderId||'Pizza Bite Order',j.trackingToken||'');renderSuccessPlaced(j.orderId||'Pizza Bite Order');playSuccessSound();cart=[];e.target.reset();renderCart()}catch(err){console.error(err);const m=String(err.message||'');const safe=!/Failed to fetch|Unexpected token|NetworkError|SyntaxError/i.test(m)&&m!=='Order failed'&&m?m:'We could not place the order right now. Please try again.';alert(safe+'. The same checkout can be retried safely.')}finally{b.disabled=false;b.textContent='Place Order'}});
+document.getElementById('checkoutForm').addEventListener('submit',async e=>{e.preventDefault();if(!cart.length)return;const f=new FormData(e.target);const idKey=sessionStorage.getItem('pb_checkout_idempotency')||('WEB-'+Date.now()+'-'+Math.random().toString(36).slice(2,10));sessionStorage.setItem('pb_checkout_idempotency',idKey);const baseNotes=String(f.get('notes')||'').trim();const payload={idempotencyKey:idKey,customerName:String(f.get('customerName')||'').trim(),phone:String(f.get('phone')||'').trim(),address:String(f.get('address')||'').trim(),area:String(f.get('area')||'').trim(),areaId:String(f.get('areaId')||'').trim(),paymentMethod:String(f.get('paymentMethod')||'Cash on Delivery'),notes:baseNotes,orderSource:'Website',fulfillmentType:fulfillmentType,items:cart.reduce(function(arr,x){if(x.isDeal){(Array.isArray(x.comps)?x.comps:[]).forEach(function(c){arr.push({itemId:String(c.menuId),quantity:Number(c.quantity||1)*Number(x.quantity||1)})});return arr}if(x.category==='Extras')return arr;const item={itemId:x.itemId,quantity:x.quantity};if(Array.isArray(x.extras)&&x.extras.length)item.extras=x.extras.map(ex=>({itemId:ex.itemId,group:ex.group||ex.name||'',label:ex.label||ex.variant||'',quantity:ex.quantity||1}));arr.push(item);return arr},[]),deals:cart.filter(function(x){return x.isDeal}).map(function(x){return{offerId:String(x.dealId),quantity:Number(x.quantity||1)}})};const b=e.target.querySelector('button[type=submit]');b.disabled=true;b.textContent='Placing order…';try{const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});const j=await r.json();if(!j.success)throw new Error(j.error||'Order failed');sessionStorage.removeItem('pb_checkout_idempotency');closeModal('checkoutModal');saveTrackedOrder(j.orderId||'Pizza Bite Order',j.trackingToken||'');renderSuccessPlaced(j.orderId||'Pizza Bite Order');playSuccessSound();cart=[];e.target.reset();renderCart()}catch(err){console.error(err);const m=String(err.message||'');const safe=!/Failed to fetch|Unexpected token|NetworkError|SyntaxError/i.test(m)&&m!=='Order failed'&&m?m:'We could not place the order right now. Please try again.';alert(safe+'. The same checkout can be retried safely.')}finally{b.disabled=false;b.textContent='Place Order'}});
 document.querySelectorAll('#checkoutForm input, #checkoutForm textarea, #checkoutForm select').forEach(function(el){el.addEventListener('focus',function(){setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'center'})},350)})});
 
 let toastTimer=null;
